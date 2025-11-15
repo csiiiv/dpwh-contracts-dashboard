@@ -61,18 +61,28 @@ export const useContractFilters = (
 
     // Apply filters
     if (filters.regions.length > 0) {
-      filtered = filtered.filter(c => filters.regions.includes(c.region))
+      filtered = filtered.filter(c => 
+        filters.regions.some(filterRegion => 
+          c.region.toLowerCase().includes(filterRegion.toLowerCase())
+        )
+      )
     }
 
     if (filters.implementing_offices.length > 0) {
-      filtered = filtered.filter(c => filters.implementing_offices.includes(c.implementing_office))
+      filtered = filtered.filter(c => 
+        filters.implementing_offices.some(filterOffice => 
+          c.implementing_office.toLowerCase().includes(filterOffice.toLowerCase())
+        )
+      )
     }
 
     if (filters.contractors.length > 0) {
       filtered = filtered.filter(c => {
         const contractorNames = getContractorNames(c)
         return filters.contractors.some(filterContractor => 
-          contractorNames.some(name => name.includes(filterContractor))
+          contractorNames.some(name => 
+            name.toLowerCase().includes(filterContractor.toLowerCase())
+          )
         )
       })
     }
@@ -86,16 +96,18 @@ export const useContractFilters = (
     }
 
     if (filters.source_of_funds.length > 0) {
-      filtered = filtered.filter(c => filters.source_of_funds.includes(c.source_of_funds))
+      filtered = filtered.filter(c => 
+        filters.source_of_funds.some(filterSource => 
+          c.source_of_funds.toLowerCase().includes(filterSource.toLowerCase())
+        )
+      )
     }
 
     if (filters.keywords.length > 0) {
       filtered = filtered.filter(c => {
         const searchText = [
           c.description,
-          c.contract_id,
-          c.region,
-          c.implementing_office
+          c.contract_id
         ].join(' ').toLowerCase()
         
         return filters.keywords.every(keyword =>

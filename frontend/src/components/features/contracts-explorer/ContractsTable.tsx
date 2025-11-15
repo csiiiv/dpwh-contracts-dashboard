@@ -120,8 +120,17 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
       )}
 
       {/* Compact Two-Row Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0 }}>
+      <div style={{ 
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch' as any,
+        msOverflowStyle: '-ms-autohiding-scrollbar'
+      }}>
+        <table style={{ 
+          width: '100%', 
+          borderCollapse: 'separate', 
+          borderSpacing: 0,
+          minWidth: '900px' // Prevent table from squeezing too much on mobile
+        }}>
           <thead>
             {/* Header Row 1 */}
             <tr style={{ borderBottom: `1px solid ${borderColor}` }}>
@@ -335,13 +344,16 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
       {/* Pagination */}
       <div style={{
         display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: spacing[3],
         marginTop: spacing[4],
         padding: spacing[3],
         borderTop: `1px solid ${borderColor}`
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2], fontSize: typography.fontSize.sm, color: textSecondary }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2], fontSize: typography.fontSize.sm, color: textSecondary, flexWrap: 'wrap' }}>
           <span>Rows per page:</span>
           <select
             value={pageSize}

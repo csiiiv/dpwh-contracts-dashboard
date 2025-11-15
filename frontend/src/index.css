@@ -16,10 +16,24 @@
 @layer base {
   html {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Enable smooth scrolling */
+    scroll-behavior: smooth;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
   }
   
   body {
     @apply bg-gray-50 text-gray-900;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Better text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Mobile-friendly text selection */
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -27,19 +41,19 @@
   }
   
   h1 {
-    @apply text-3xl lg:text-4xl;
+    @apply text-2xl sm:text-3xl lg:text-4xl;
   }
   
   h2 {
-    @apply text-2xl lg:text-3xl;
+    @apply text-xl sm:text-2xl lg:text-3xl;
   }
   
   h3 {
-    @apply text-xl lg:text-2xl;
+    @apply text-lg sm:text-xl lg:text-2xl;
   }
   
   h4 {
-    @apply text-lg lg:text-xl;
+    @apply text-base sm:text-lg lg:text-xl;
   }
   :root {
     --background: 0 0% 100%;
@@ -242,6 +256,30 @@
 @media (max-width: 640px) {
   .chart-container {
     height: 300px;
+  }
+  
+  /* Mobile-friendly table scrolling */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better mobile padding */
+  body {
+    padding: 0;
+  }
+  
+  /* Smaller touch targets adjusted */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .chart-container {
+    height: 350px;
   }
 }
 

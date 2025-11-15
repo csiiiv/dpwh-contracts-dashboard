@@ -18,6 +18,14 @@ export const ContentContainer = styled.div<StyledProps>`
   margin: 0 auto;
   padding: ${spacing[6]};
   background-color: var(--color-background-primary);
+  
+  @media (max-width: 768px) {
+    padding: ${spacing[4]};
+  }
+  
+  @media (max-width: 640px) {
+    padding: ${spacing[3]};
+  }
 `
 
 // Card Components
@@ -28,23 +36,23 @@ export const Card = styled.div<StyledProps>`
   padding: ${spacing[6]};
   margin-bottom: ${spacing[6]};
   box-shadow: ${commonStyles.shadow.sm};
+  
+  @media (max-width: 768px) {
+    padding: ${spacing[4]};
+    margin-bottom: ${spacing[4]};
+  }
+  
+  @media (max-width: 640px) {
+    padding: ${spacing[3]};
+    margin-bottom: ${spacing[3]};
+    border-radius: ${commonStyles.borderRadius.md};
+  }
 `
 
 export const CardHeader = styled.div<StyledProps>`
   padding: ${spacing[6]} ${spacing[6]} ${spacing[4]} ${spacing[6]};
   border-bottom: 1px solid var(--color-border-light);
   margin-bottom: ${spacing[4]};
-`
-
-export const CardBody = styled.div<StyledProps>`
-  padding: ${spacing[4]} ${spacing[6]};
-`
-
-export const CardFooter = styled.div<StyledProps>`
-  padding: ${spacing[4]} ${spacing[6]} ${spacing[6]} ${spacing[6]};
-  border-top: 1px solid var(--color-border-light);
-  background-color: var(--color-background-tertiary);
-  border-radius: 0 0 ${commonStyles.borderRadius.lg} ${commonStyles.borderRadius.lg};
 `
 
 // Typography Components
@@ -54,6 +62,15 @@ export const PageTitle = styled.h1<StyledProps>`
   color: var(--color-text-primary);
   margin-bottom: ${spacing[4]};
   text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: ${typography.fontSize['3xl']};
+  }
+  
+  @media (max-width: 640px) {
+    font-size: ${typography.fontSize['2xl']};
+    margin-bottom: ${spacing[3]};
+  }
 `
 
 export const PageSubtitle = styled.p<StyledProps>`
@@ -65,6 +82,17 @@ export const PageSubtitle = styled.p<StyledProps>`
   margin-left: auto;
   margin-right: auto;
   line-height: 1.6;
+  
+  @media (max-width: 768px) {
+    font-size: ${typography.fontSize.lg};
+    margin-bottom: ${spacing[6]};
+  }
+  
+  @media (max-width: 640px) {
+    font-size: ${typography.fontSize.base};
+    margin-bottom: ${spacing[4]};
+    padding: 0 ${spacing[2]};
+  }
 `
 
 export const SectionTitle = styled.h2<StyledProps>`
@@ -72,6 +100,11 @@ export const SectionTitle = styled.h2<StyledProps>`
   font-weight: ${typography.fontWeight.bold};
   color: var(--color-text-primary);
   margin-bottom: ${spacing[4]};
+  
+  @media (max-width: 640px) {
+    font-size: ${typography.fontSize.lg};
+    margin-bottom: ${spacing[3]};
+  }
 `
 
 export const SubsectionTitle = styled.h3<StyledProps>`

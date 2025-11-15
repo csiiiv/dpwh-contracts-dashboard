@@ -5,21 +5,26 @@ A modern web application for exploring and analyzing DPWH (Department of Public 
 ## 🚀 Features
 
 ### Contracts Explorer
-- **Advanced Filtering**: Filter by region, office, contractor, status, year, and more
-- **Two-Row Compact Table**: Space-efficient display with sortable columns
-- **Smart Caching**: IndexedDB-based caching with automatic invalidation
-- **Contract Details Modal**: Comprehensive contract information with hero metrics
+- **Advanced Filtering**: Filter by region, office, contractor, status, year, source of funds, and keywords
+- **Custom Substring Search**: Add custom filters for any field (e.g., type "revoked" to find contractors with revoked licenses)
+- **Debounced Updates**: 2-second delay prevents excessive reloading during rapid filter changes
+- **Two-Row Compact Table**: Space-efficient display with independent sortable columns
+- **Smart Caching**: IndexedDB-based caching with metadata file for automatic invalidation
+- **Contract Details Modal**: Comprehensive contract information with hero metrics and 2x2 info grid
 - **Analytics Dashboard**: Drill-down analysis by contractor, region, office, and year
+- **Mobile-Friendly**: Responsive design with horizontal scrolling tables and touch-optimized controls
 
 ### Data Quality
-- **CSV Metadata Tracking**: Automatic cache invalidation when data updates
+- **CSV Metadata Tracking**: Lightweight 100-byte metadata file for cache validation
 - **Quality Indicators**: Error, warning, and info tracking per contract
-- **209,198+ Contracts**: Full historical data from multiple years
+- **209,198+ Contracts**: Full historical data from multiple years and offices
 
 ### UI/UX
 - **Dark/Light Mode**: System preference detection with manual toggle
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Loading States**: Visual feedback during data operations
+- **Responsive Design**: Optimized for mobile phones, tablets, and desktops
+- **Touch-Friendly**: Minimum 44px touch targets, smooth scrolling on mobile
+- **Loading States**: Visual feedback with backdrop blur during data operations
+- **Grouped Filter Chips**: Color-coded filter categories with individual clear buttons
 - **Export Functionality**: Download filtered results as CSV
 
 ## 📋 Prerequisites
@@ -107,21 +112,66 @@ See \`frontend/CSV_METADATA_README.md\` for details.
 
 ## 🎨 Key Components
 
+### ContractsFilters
+- Searchable dropdowns with substring matching
+- Custom filter input (type any text, press Enter to filter)
+- Grouped filter chips by category (7 color-coded groups)
+- Individual clear buttons per filter group
+- Status and year toggle buttons
+
 ### ContractsTable
-Two-row compact format with sortable columns and loading states.
+- Two-row compact format per contract
+- Independent sortable columns (Contract ID, Contractors, Region, Status, Dates, Price)
+- Responsive horizontal scrolling on mobile (min-width: 900px)
+- Loading overlay with debounced updates (2-second delay)
+- Hover effect syncs between both rows
+- Touch-optimized pagination controls
+
+### ContractsSummary
+- 5 metric cards: Total Contracts, Total Value, Average Value, Completed, On-Going
+- Responsive sizing (140-200px width, scales down on mobile)
+- Horizontal scroll on small screens
+- Displays **after** filters for better UX flow
 
 ### ContractDetailsModal
-Hero header with metrics, basic info, contractors, location, and data quality.
+- Hero header with 4 key metrics (Contract Value, Status, Timeline, Progress)
+- 2x2 info grid: Basic Info | Contractors, Location | Data Quality
+- Up to 4 contractors displayed
+- Data quality indicators with emojis
 
-### Analytics
-Group by contractor/region/office/year with aggregates and drill-down.
+### ContractsAnalytics
+- Group by contractor/region/office/year
+- Aggregates: total count, total amount, average amount
+- Drill-down capability with nested contract views
 
 ## 🗄️ Caching Strategy
 
-1. **First Load**: Downloads CSV, parses, caches in IndexedDB
-2. **Subsequent Loads**: Checks metadata file for updates
-3. **Cache Hit**: Instant load from IndexedDB
-4. **Cache Miss**: Re-downloads when timestamp changes
+1. **First Load**: Downloads CSV (~50MB), parses 209K+ contracts, caches in IndexedDB
+2. **Metadata Check**: Fetches lightweight metadata file (100 bytes) with timestamp
+3. **Cache Hit**: Instant load from IndexedDB (~100-300ms)
+4. **Cache Miss**: Re-downloads CSV when metadata timestamp changes
+5. **No HEAD Requests**: Metadata file approach avoids downloading full CSV just to check updates
+## 📊 Performance
+
+- **Initial Load**: ~3-5 seconds (CSV download + parse + cache)
+- **Cached Load**: ~100-300ms (IndexedDB read)
+- **Filtering/Sorting**: Debounced 2 seconds after last change
+- **Filter Operations**: <50ms (client-side filtering of cached data)
+- **Table Rendering**: Paginated (25/50/100/200 rows per page)
+
+## 📱 Mobile Optimization
+
+- **Responsive Breakpoints**: 640px (mobile), 768px (tablet), 1024px (desktop)
+- **Touch Targets**: Minimum 44x44px for buttons and interactive elements
+- **Horizontal Scrolling**: Table scrolls horizontally on narrow screens
+- **Flexible Layouts**: Cards, filters, and metrics adapt to screen width
+- **No Pinch-Zoom Needed**: Content scales appropriately
+- **Smooth Scrolling**: `-webkit-overflow-scrolling: touch` for iOSual cache clear utility
+
+**Cache Keys:**
+- `contracts_csv_v1`: Full contracts array
+- `contracts_aggregates_v1`: Pre-computed filter options
+- `contracts_csv_timestamp_v1`: Last update timestamp
 
 ## 📊 Performance
 

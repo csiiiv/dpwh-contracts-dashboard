@@ -49,6 +49,9 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
     !(filters[filterType] as (string | number)[]).includes(opt)
   )
 
+  const hasExactMatch = filtered.some(opt => opt.toLowerCase() === value.toLowerCase())
+  const showAddOption = value.trim() && !hasExactMatch
+
   return (
     <div ref={dropdownRef} style={{ position: 'relative', width: '100%' }}>
       <input
@@ -57,9 +60,14 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsOpen(true)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && filtered.length > 0) {
-            onSelect(filtered[0])
-            setIsOpen(false)
+          if (e.key === 'Enter') {
+            if (value.trim()) {
+              onSelect(value.trim())
+              setIsOpen(false)
+            } else if (filtered.length > 0) {
+              onSelect(filtered[0])
+              setIsOpen(false)
+            }
           } else if (e.key === 'Escape') {
             setIsOpen(false)
           }
@@ -75,7 +83,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           fontSize: typography.fontSize.sm
         }}
       />
-      {isOpen && filtered.length > 0 && (
+      {isOpen && (showAddOption || filtered.length > 0) && (
         <div style={{
           position: 'absolute',
           top: '100%',
@@ -90,6 +98,30 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           boxShadow: `0 4px 6px rgba(0, 0, 0, 0.1)`,
           zIndex: 1000
         }}>
+          {showAddOption && (
+            <div
+              onClick={() => {
+                onSelect(value.trim())
+                setIsOpen(false)
+              }}
+              style={{
+                padding: spacing[2],
+                cursor: 'pointer',
+                borderBottom: `1px solid ${vars.border.light}`,
+                color: vars.primary[700],
+                fontSize: typography.fontSize.sm,
+                fontWeight: typography.fontWeight.medium
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = vars.background.secondary
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+            >
+              Add as new filter: "{value.trim()}"
+            </div>
+          )}
           {filtered.slice(0, 10).map((opt, idx) => (
             <div
               key={idx}
@@ -686,7 +718,7 @@ export const ContractsFilters: React.FC<ContractsFiltersProps> = ({
                 handleKeywordAdd(searchInputs.keyword)
               }
             }}
-            placeholder="Enter keyword and press Enter to search description, contract ID, etc..."
+            placeholder="Enter keyword and press Enter to search in description and contract ID..."
             style={{
               flex: 1,
               padding: spacing[2],

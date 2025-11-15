@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { useTheme } from '../../../contexts/ThemeContext'
 import { getThemeVars } from '../../../design-system/theme'
 import { spacing, typography } from '../../../design-system'
@@ -29,7 +29,7 @@ export const ContractsExplorer: React.FC = () => {
   // Load contracts data
   const { contracts, loading, loadingStage, error, filterOptions, reload } = useContractsData()
 
-  // Filter state
+  // Filter state (immediate, not debounced)
   const [filters, setFilters] = useState<ContractFilters>({
     regions: [],
     implementing_offices: [],
@@ -40,11 +40,38 @@ export const ContractsExplorer: React.FC = () => {
     keywords: []
   })
 
-  // Sort state
+  // Debounced filter state (used for actual filtering)
+  const [debouncedFilters, setDebouncedFilters] = useState<ContractFilters>(filters)
+
+  // Sort state (immediate, not debounced)
   const [sortConfig, setSortConfig] = useState<ContractSortConfig>({
     field: 'cost_php',
     direction: 'desc'
   })
+
+  // Debounced sort state (used for actual sorting)
+  const [debouncedSortConfig, setDebouncedSortConfig] = useState<ContractSortConfig>(sortConfig)
+
+  // Debounce timer ref
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Debounce filters and sort config changes (2 seconds)
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedFilters(filters)
+      setDebouncedSortConfig(sortConfig)
+    }, 2000)
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [filters, sortConfig])
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -107,13 +134,13 @@ export const ContractsExplorer: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [contracts, analyticsOpen, selectedContract])
 
-  // Apply filters and sorting
-  const filteredContracts = useContractFilters(contracts, filters, sortConfig)
+  // Apply filters and sorting (using debounced values)
+  const filteredContracts = useContractFilters(contracts, debouncedFilters, debouncedSortConfig)
 
-  // Get aggregates for analytics (using first dimension as default)
+  // Get aggregates for analytics (using debounced filters)
   const { aggregates } = useContractsAnalytics(
     contracts,
-    filters,
+    debouncedFilters,
     'by_contractor',
     'amount',
     'all'
@@ -271,14 +298,6 @@ export const ContractsExplorer: React.FC = () => {
           </Card>
         )}
 
-        {/* Summary Statistics */}
-        {!loading && !error && (
-          <ContractsSummary
-            stats={summaryStats}
-            isDark={isDark}
-          />
-        )}
-
         {/* Filters */}
         {!loading && !error && (
           <ContractsFilters
@@ -289,6 +308,14 @@ export const ContractsExplorer: React.FC = () => {
             onClearFilters={handleClearFilters}
             onDateRangeChange={handleDateRangeChange}
             onValueRangeChange={handleValueRangeChange}
+            isDark={isDark}
+          />
+        )}
+
+        {/* Summary Statistics */}
+        {!loading && !error && (
+          <ContractsSummary
+            stats={summaryStats}
             isDark={isDark}
           />
         )}
