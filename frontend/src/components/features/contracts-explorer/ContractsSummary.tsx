@@ -62,37 +62,40 @@ export const ContractsSummary: React.FC<ContractsSummaryProps> = ({
       <div style={{
         display: 'flex',
         flexDirection: 'row',
-        gap: spacing[4],
-        overflowX: 'auto'
+        gap: spacing[3],
+        overflowX: 'auto',
+        padding: spacing[2]
       }}>
         {statCards.map((stat, index) => (
           <div
             key={index}
             style={{
-              padding: spacing[4],
+              padding: spacing[3],
               backgroundColor: vars.background.secondary,
               borderRadius: spacing[2],
               textAlign: 'center',
-              minWidth: '200px',
-              flex: '1 0 auto'
+              minWidth: '140px',
+              flex: '1 1 0',
+              maxWidth: '200px'
             }}
           >
             <div style={{
-              fontSize: '2em',
-              marginBottom: spacing[2]
+              fontSize: '1.5em',
+              marginBottom: spacing[1]
             }}>
               {stat.icon}
             </div>
             <div style={{
-              fontSize: typography.fontSize['2xl'],
+              fontSize: typography.fontSize.lg,
               fontWeight: typography.fontWeight.bold,
               color: vars.text.primary,
-              marginBottom: spacing[1]
+              marginBottom: spacing[1],
+              wordBreak: 'break-word'
             }}>
               {stat.value}
             </div>
             <div style={{
-              fontSize: typography.fontSize.sm,
+              fontSize: typography.fontSize.xs,
               color: vars.text.secondary
             }}>
               {stat.label}

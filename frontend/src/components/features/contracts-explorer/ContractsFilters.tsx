@@ -208,73 +208,261 @@ export const ContractsFilters: React.FC<ContractsFiltersProps> = ({
         )}
       </div>
 
-      {/* Active Filter Chips */}
+      {/* Active Filter Chips - Grouped by Category */}
       {hasActiveFilters && (
         <div style={{
           display: 'flex',
-          flexWrap: 'wrap',
-          gap: spacing[2],
+          flexDirection: 'column',
+          gap: spacing[3],
           marginBottom: spacing[4],
           padding: spacing[3],
           backgroundColor: vars.background.secondary,
           borderRadius: spacing[2]
         }}>
-          {filters.regions.map((region, idx) => (
-            <FilterChip
-              key={`region-${idx}`}
-              label={`📍 ${region}`}
-              onRemove={() => onRemoveFilter('regions', idx)}
-              isDark={isDark}
-            />
-          ))}
-          {filters.implementing_offices.map((office, idx) => (
-            <FilterChip
-              key={`office-${idx}`}
-              label={`🏛️ ${office}`}
-              onRemove={() => onRemoveFilter('implementing_offices', idx)}
-              isDark={isDark}
-            />
-          ))}
-          {filters.contractors.map((contractor, idx) => (
-            <FilterChip
-              key={`contractor-${idx}`}
-              label={`🏢 ${contractor}`}
-              onRemove={() => onRemoveFilter('contractors', idx)}
-              isDark={isDark}
-            />
-          ))}
-          {filters.statuses.map((status, idx) => (
-            <FilterChip
-              key={`status-${idx}`}
-              label={`📊 ${status}`}
-              onRemove={() => onRemoveFilter('statuses', idx)}
-              isDark={isDark}
-            />
-          ))}
-          {filters.years.map((year, idx) => (
-            <FilterChip
-              key={`year-${idx}`}
-              label={`📅 ${year}`}
-              onRemove={() => onRemoveFilter('years', idx)}
-              isDark={isDark}
-            />
-          ))}
-          {filters.source_of_funds.map((source, idx) => (
-            <FilterChip
-              key={`source-${idx}`}
-              label={`💰 ${source}`}
-              onRemove={() => onRemoveFilter('source_of_funds', idx)}
-              isDark={isDark}
-            />
-          ))}
-          {filters.keywords.map((keyword, idx) => (
-            <FilterChip
-              key={`keyword-${idx}`}
-              label={`🔎 ${keyword}`}
-              onRemove={() => onRemoveFilter('keywords', idx)}
-              isDark={isDark}
-            />
-          ))}
+          {/* Regions */}
+          {filters.regions.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>📍 REGIONS</span>
+                <button
+                  onClick={() => filters.regions.forEach((_, idx) => onRemoveFilter('regions', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #10b98180`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#10b981',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.regions.map((region, idx) => (
+                  <FilterChip
+                    key={`region-${idx}`}
+                    label={region}
+                    onRemove={() => onRemoveFilter('regions', idx)}
+                    isDark={isDark}
+                    color="#10b981"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Implementing Offices */}
+          {filters.implementing_offices.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>🏛️ OFFICES</span>
+                <button
+                  onClick={() => filters.implementing_offices.forEach((_, idx) => onRemoveFilter('implementing_offices', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #8b5cf680`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#8b5cf6',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.implementing_offices.map((office, idx) => (
+                  <FilterChip
+                    key={`office-${idx}`}
+                    label={office}
+                    onRemove={() => onRemoveFilter('implementing_offices', idx)}
+                    isDark={isDark}
+                    color="#8b5cf6"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Contractors */}
+          {filters.contractors.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>🏢 CONTRACTORS</span>
+                <button
+                  onClick={() => filters.contractors.forEach((_, idx) => onRemoveFilter('contractors', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #f59e0b80`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#f59e0b',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.contractors.map((contractor, idx) => (
+                  <FilterChip
+                    key={`contractor-${idx}`}
+                    label={contractor}
+                    onRemove={() => onRemoveFilter('contractors', idx)}
+                    isDark={isDark}
+                    color="#f59e0b"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Statuses */}
+          {filters.statuses.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>📊 STATUS</span>
+                <button
+                  onClick={() => filters.statuses.forEach((_, idx) => onRemoveFilter('statuses', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #3b82f680`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#3b82f6',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.statuses.map((status, idx) => (
+                  <FilterChip
+                    key={`status-${idx}`}
+                    label={status}
+                    onRemove={() => onRemoveFilter('statuses', idx)}
+                    isDark={isDark}
+                    color="#3b82f6"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Years */}
+          {filters.years.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>📅 YEARS</span>
+                <button
+                  onClick={() => filters.years.forEach((_, idx) => onRemoveFilter('years', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #ec489980`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#ec4899',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.years.map((year, idx) => (
+                  <FilterChip
+                    key={`year-${idx}`}
+                    label={`${year}`}
+                    onRemove={() => onRemoveFilter('years', idx)}
+                    isDark={isDark}
+                    color="#ec4899"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Source of Funds */}
+          {filters.source_of_funds.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>💰 SOURCE OF FUNDS</span>
+                <button
+                  onClick={() => filters.source_of_funds.forEach((_, idx) => onRemoveFilter('source_of_funds', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #06b6d480`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#06b6d4',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.source_of_funds.map((source, idx) => (
+                  <FilterChip
+                    key={`source-${idx}`}
+                    label={source}
+                    onRemove={() => onRemoveFilter('source_of_funds', idx)}
+                    isDark={isDark}
+                    color="#06b6d4"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Keywords */}
+          {filters.keywords.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] }}>
+                <span style={{ fontSize: typography.fontSize.xs, fontWeight: 600, color: vars.text.secondary }}>🔎 KEYWORDS</span>
+                <button
+                  onClick={() => filters.keywords.forEach((_, idx) => onRemoveFilter('keywords', 0))}
+                  style={{
+                    background: 'none',
+                    border: `1px solid #84cc1680`,
+                    borderRadius: spacing[1],
+                    padding: `2px ${spacing[2]}`,
+                    cursor: 'pointer',
+                    fontSize: typography.fontSize.xs,
+                    color: '#84cc16',
+                    fontWeight: 600
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing[2] }}>
+                {filters.keywords.map((keyword, idx) => (
+                  <FilterChip
+                    key={`keyword-${idx}`}
+                    label={keyword}
+                    onRemove={() => onRemoveFilter('keywords', idx)}
+                    isDark={isDark}
+                    color="#84cc16"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
