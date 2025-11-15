@@ -1,0 +1,160 @@
+[
+  {
+    "name": "DPWH District Offices",
+    "description": "DPWH District Engineering Offices contracts using various naming patterns",
+    "filters": {
+      "contractors": [],
+      "areas": [],
+      "organizations": [
+        "dpwh && deo",
+        "public works && deo",
+        "public works && dist",
+        "dpwh && dist"
+      ],
+      "business_categories": [],
+      "keywords": [],
+      "timeRanges": []
+    },
+    "dateRange": {
+      "type": "all_time",
+      "year": 2021,
+      "quarter": 4,
+      "startDate": "2013-01-01",
+      "endDate": "2025-12-31"
+    },
+    "includeFloodControl": true,
+    "id": "custom_1758942398828_s9j5wsyjl",
+    "createdAt": "2025-09-27T03:06:38.828Z",
+    "updatedAt": "2025-09-27T03:33:37.075Z"
+  },
+  {
+    "name": "All DPWH Offices",
+    "description": "Comprehensive view of all Department of Public Works and Highways contracts across central and regional offices",
+    "filters": {
+      "contractors": [],
+      "areas": [],
+      "organizations": [
+        "dpwh",
+        "public works and highways"
+      ],
+      "business_categories": [],
+      "keywords": [],
+      "timeRanges": []
+    },
+    "dateRange": {
+      "type": "all_time",
+      "year": 2021,
+      "quarter": 4,
+      "startDate": "2013-01-01",
+      "endDate": "2025-12-31"
+    },
+    "includeFloodControl": true,
+    "id": "custom_1758944133613_gypptlo6a",
+    "createdAt": "2025-09-27T03:35:33.613Z",
+    "updatedAt": "2025-09-27T03:35:33.613Z"
+  },
+  {
+    "name": "Flood control projects",
+    "description": "Infrastructure projects focused on flood prevention, drainage systems, and water management",
+    "filters": {
+      "contractors": [],
+      "areas": [],
+      "organizations": [],
+      "business_categories": ["constr","flood"],
+      "keywords": [
+        "flood",
+        "drainage",
+        "dike",
+        "slope protection",
+        "revetment"
+      ],
+      "timeRanges": []
+    },
+    "dateRange": {
+      "type": "all_time",
+      "year": 2021,
+      "quarter": 4,
+      "startDate": "2013-01-01",
+      "endDate": "2025-12-31"
+    },
+    "includeFloodControl": true,
+    "id": "custom_1758947838713_o2u607isf",
+    "createdAt": "2025-09-27T04:37:18.713Z",
+    "updatedAt": "2025-09-27T04:37:18.713Z"
+  },
+  {
+    "name": "Wawao Builders",
+    "description": "All contracts awarded to Wawao Builders construction company",
+    "filters": {
+      "contractors": [
+        "wawao"
+      ],
+      "areas": [],
+      "organizations": [],
+      "business_categories": [],
+      "keywords": [],
+      "timeRanges": []
+    },
+    "dateRange": {
+      "type": "all_time",
+      "year": 2021,
+      "quarter": 4,
+      "startDate": "2013-01-01",
+      "endDate": "2025-12-31"
+    },
+    "includeFloodControl": true,
+    "id": "custom_1758950709304_4wp8qalji",
+    "createdAt": "2025-09-27T05:25:09.304Z",
+    "updatedAt": "2025-09-27T05:25:09.304Z"
+  },
+  {
+    "name": "Pumping Stations",
+    "description": "Water pumping station construction and maintenance projects",
+    "filters": {
+      "contractors": [],
+      "areas": [],
+      "organizations": [],
+      "business_categories": [],
+      "keywords": [
+        "pumping station"
+      ],
+      "timeRanges": []
+    },
+    "dateRange": {
+      "type": "all_time",
+      "year": 2021,
+      "quarter": 4,
+      "startDate": "2013-01-01",
+      "endDate": "2025-12-31"
+    },
+    "includeFloodControl": true,
+    "id": "custom_1758951141787_gef9kkotp",
+    "createdAt": "2025-09-27T05:32:21.787Z",
+    "updatedAt": "2025-09-27T05:32:33.134Z"
+  },
+  {
+    "name": "multi purpose bldg / senior citizens office",
+    "description": "Multi-purpose building projects including senior citizens offices and community facilities",
+    "filters": {
+      "contractors": [],
+      "areas": [],
+      "organizations": [],
+      "business_categories": [],
+      "keywords": [
+        "multi && senior && cit"
+      ],
+      "timeRanges": []
+    },
+    "dateRange": {
+      "type": "all_time",
+      "year": 2021,
+      "quarter": 4,
+      "startDate": "2013-01-01",
+      "endDate": "2025-12-31"
+    },
+    "includeFloodControl": true,
+    "id": "custom_1758960386112_509o5vfio",
+    "createdAt": "2025-09-27T08:06:26.112Z",
+    "updatedAt": "2025-09-27T08:06:26.112Z"
+  }
+]

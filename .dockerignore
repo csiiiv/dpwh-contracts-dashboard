@@ -1,0 +1,28 @@
+# Global ignore
+**/.git
+**/.gitignore
+**/.venv
+**/venv
+**/node_modules
+**/dist
+**/.cache
+**/.pytest_cache
+**/__pycache__
+**/.mypy_cache
+**/.DS_Store
+**/*.log
+**/.env
+**/.env.*
+**/db.sqlite3
+logs/
+
+# For backend build with repo-root context, include only what's needed
+!.dockerignore
+!docker-compose.yml
+!backend/
+!backend/django/
+!backend/django/**
+!backend/django/Dockerfile
+!data/
+!data/parquet/
+!data/parquet/**

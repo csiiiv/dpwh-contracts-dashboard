@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IndexedDB Cache Test</title>
+</head>
+<body>
+  <h1>IndexedDB Cache Test</h1>
+  <div id="output"></div>
+  
+  <script type="module">
+    import { get, set } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm'
+    
+    const output = document.getElementById('output')
+    
+    async function testCache() {
+      output.innerHTML += '<p>Testing IndexedDB...</p>'
+      
+      // Test write
+      await set('test_key', { message: 'Hello from IndexedDB!', timestamp: Date.now() })
+      output.innerHTML += '<p>✅ Write successful</p>'
+      
+      // Test read
+      const data = await get('test_key')
+      output.innerHTML += `<p>✅ Read successful: ${JSON.stringify(data)}</p>`
+      
+      // Check contracts cache
+      const contracts = await get('contracts_csv_v1')
+      const aggregates = await get('contracts_aggregates_v1')
+      
+      output.innerHTML += `<p>Contracts in cache: ${contracts ? contracts.length : 'null'}</p>`
+      output.innerHTML += `<p>Aggregates in cache: ${aggregates ? 'present' : 'null'}</p>`
+      
+      if (aggregates) {
+        output.innerHTML += `<pre>${JSON.stringify(aggregates, null, 2)}</pre>`
+      }
+    }
+    
+    testCache().catch(err => {
+      output.innerHTML += `<p style="color: red;">Error: ${err.message}</p>`
+    })
+  </script>
+</body>
+</html>
