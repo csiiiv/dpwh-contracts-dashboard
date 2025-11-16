@@ -280,7 +280,7 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     wordBreak: 'break-word',
                     verticalAlign: 'top'
                   }}>
-                    {getContractorNames(contract).join(', ') || 'N/A'}
+                    {getContractorNames(contract).join(' | ') || 'N/A'}
                   </td>
                   <td style={{ 
                     padding: `${spacing[2]} ${spacing[2]}`, 
