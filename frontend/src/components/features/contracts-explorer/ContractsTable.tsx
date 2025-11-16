@@ -277,7 +277,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
                     lineHeight: '2.0',
-                    wordBreak: 'break-word'
+                    wordBreak: 'break-word',
+                    verticalAlign: 'top'
                   }}>
                     {contract.description || 'N/A'}
                   </td>
@@ -356,14 +357,15 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     fontSize: typography.fontSize.xs, 
                     color: textSecondary,
                     maxWidth: '400px',
-                    height: '3em',
+                    height: '4em',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
                     lineHeight: '2.0',
-                    wordBreak: 'break-word'
+                    wordBreak: 'break-word',
+                    verticalAlign: 'top'
                   }}>
                     {getContractorNames(contract).join(', ') || 'N/A'}
                   </td>
@@ -371,7 +373,7 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
                     color: textSecondary,
-                    height: '3em'
+                    height: '4em'
                   }}>
                     {contract.implementing_office || 'N/A'}
                   </td>
@@ -379,7 +381,7 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
                     color: textSecondary,
-                    height: '3em'
+                    height: '4em'
                   }}>
                     {formatDate(contract.expiry_date)}
                   </td>
