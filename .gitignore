@@ -25,6 +25,7 @@ MANIFEST
 
 # MISC
 archive/
+!public/contracts_all_years_all_offices.csv
 
 # Virtual Environment
 venv/
