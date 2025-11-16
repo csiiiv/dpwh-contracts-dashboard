@@ -277,22 +277,15 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
                     lineHeight: '1.5',
-                    wordBreak: 'break-word'
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal'
                   }}>
                     {contract.description || 'N/A'}
                   </td>
                   <td style={{ 
                     padding: `${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.sm, 
-                    color: textPrimary,
-                    maxWidth: '200px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '1.5',
-                    wordBreak: 'break-word'
+                    color: textPrimary
                   }}>
                     {contract.region || 'N/A'}
                   </td>
@@ -319,14 +312,7 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   <td style={{ 
                     padding: `${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.sm, 
-                    color: textPrimary,
-                    maxWidth: '150px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '1.5'
+                    color: textPrimary
                   }}>
                     {formatDate(contract.effectivity_date)}
                   </td>
@@ -377,36 +363,22 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
                     lineHeight: '1.5',
-                    wordBreak: 'break-word'
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal'
                   }}>
                     {getContractorNames(contract).join(', ') || 'N/A'}
                   </td>
                   <td style={{ 
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
-                    color: textSecondary, 
-                    maxWidth: '250px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '1.5',
-                    wordBreak: 'break-word'
+                    color: textSecondary
                   }}>
                     {contract.implementing_office || 'N/A'}
                   </td>
                   <td style={{ 
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
-                    color: textSecondary,
-                    maxWidth: '150px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '1.5'
+                    color: textSecondary
                   }}>
                     {formatDate(contract.expiry_date)}
                   </td>
