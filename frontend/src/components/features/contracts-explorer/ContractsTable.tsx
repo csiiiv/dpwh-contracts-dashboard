@@ -210,6 +210,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
           <tbody>
             {contracts.map((contract, idx) => {
               const uniqueKey = contract.year && contract.contract_id ? `${contract.year}-${contract.contract_id}` : contract.contract_id || `idx-${idx}`
+              const isEven = idx % 2 === 0
+              const rowBg = isEven ? 'transparent' : (isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)')
               return (
               <React.Fragment key={uniqueKey}>
                 {/* Row 1 */}
@@ -217,7 +219,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   style={{
                     borderBottom: 'none',
                     cursor: 'pointer',
-                    transition: 'background-color 0.15s'
+                    transition: 'background-color 0.15s',
+                    backgroundColor: rowBg
                   }}
                   onMouseEnter={(e) => { 
                     const nextRow = e.currentTarget.nextElementSibling as HTMLElement
@@ -226,8 +229,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   }}
                   onMouseLeave={(e) => { 
                     const nextRow = e.currentTarget.nextElementSibling as HTMLElement
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                    if (nextRow) nextRow.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.backgroundColor = rowBg
+                    if (nextRow) nextRow.style.backgroundColor = rowBg
                   }}
                   onClick={() => onContractClick?.(contract)}
                 >
@@ -263,7 +266,19 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.sm, color: textPrimary, fontWeight: 600 }}>
                     {contract.contract_id || 'N/A'}
                   </td>
-                  <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.sm, color: textPrimary, maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <td style={{ 
+                    padding: `${spacing[2]} ${spacing[2]}`, 
+                    fontSize: typography.fontSize.sm, 
+                    color: textPrimary, 
+                    maxWidth: '400px',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as any,
+                    lineHeight: '1.5',
+                    minHeight: '3em',
+                    wordBreak: 'break-word'
+                  }}>
                     {getContractorNames(contract).join(', ') || 'N/A'}
                   </td>
                   <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.sm, color: textPrimary }}>
@@ -305,7 +320,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   style={{
                     borderBottom: `1px solid ${borderColor}`,
                     cursor: 'pointer',
-                    transition: 'background-color 0.15s'
+                    transition: 'background-color 0.15s',
+                    backgroundColor: rowBg
                   }}
                   onMouseEnter={(e) => { 
                     const prevRow = e.currentTarget.previousElementSibling as HTMLElement
@@ -314,18 +330,40 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   }}
                   onMouseLeave={(e) => { 
                     const prevRow = e.currentTarget.previousElementSibling as HTMLElement
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                    if (prevRow) prevRow.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.backgroundColor = rowBg
+                    if (prevRow) prevRow.style.backgroundColor = rowBg
                   }}
                   onClick={() => onContractClick?.(contract)}
                 >
                   <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary }}>
                     {contract.year || 'N/A'}
                   </td>
-                  <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary, maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <td style={{ 
+                    padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
+                    fontSize: typography.fontSize.xs, 
+                    color: textSecondary, 
+                    maxWidth: '400px',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as any,
+                    lineHeight: '1.5',
+                    wordBreak: 'break-word'
+                  }}>
                     {contract.description || 'N/A'}
                   </td>
-                  <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <td style={{ 
+                    padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
+                    fontSize: typography.fontSize.xs, 
+                    color: textSecondary, 
+                    maxWidth: '250px',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as any,
+                    lineHeight: '1.5',
+                    wordBreak: 'break-word'
+                  }}>
                     {contract.implementing_office || 'N/A'}
                   </td>
                   <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary }}>
