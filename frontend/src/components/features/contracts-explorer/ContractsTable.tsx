@@ -356,6 +356,7 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     fontSize: typography.fontSize.xs, 
                     color: textSecondary,
                     maxWidth: '400px',
+                    height: '3em',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     display: '-webkit-box',
@@ -369,14 +370,16 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   <td style={{ 
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
-                    color: textSecondary
+                    color: textSecondary,
+                    height: '3em'
                   }}>
                     {contract.implementing_office || 'N/A'}
                   </td>
                   <td style={{ 
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
-                    color: textSecondary
+                    color: textSecondary,
+                    height: '3em'
                   }}>
                     {formatDate(contract.expiry_date)}
                   </td>
