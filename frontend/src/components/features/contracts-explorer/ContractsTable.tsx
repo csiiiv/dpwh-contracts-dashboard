@@ -136,16 +136,17 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
             <tr style={{ borderBottom: `1px solid ${borderColor}` }}>
               <th rowSpan={2} style={{ padding: spacing[2], width: '40px', textAlign: 'center', borderBottom: `2px solid ${borderColor}` }}></th>
               <th 
-                style={{ padding: `${spacing[2]} ${spacing[2]} ${spacing[1]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
+                rowSpan={2}
+                style={{ padding: spacing[2], textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary, borderBottom: `2px solid ${borderColor}` }}
                 onClick={() => handleSort('contract_id')}
               >
                 Contract ID <SortIcon field="contract_id" />
               </th>
               <th 
                 style={{ padding: `${spacing[2]} ${spacing[2]} ${spacing[1]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
-                onClick={() => handleSort('contractor_name_1')}
+                onClick={() => handleSort('description')}
               >
-                Contractors <SortIcon field="contractor_name_1" />
+                Description <SortIcon field="description" />
               </th>
               <th 
                 style={{ padding: `${spacing[2]} ${spacing[2]} ${spacing[1]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
@@ -154,7 +155,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                 Region <SortIcon field="region" />
               </th>
               <th 
-                style={{ padding: `${spacing[2]} ${spacing[2]} ${spacing[1]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
+                rowSpan={2}
+                style={{ padding: spacing[2], textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary, borderBottom: `2px solid ${borderColor}` }}
                 onClick={() => handleSort('status')}
               >
                 Status <SortIcon field="status" />
@@ -177,27 +179,15 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
             <tr style={{ borderBottom: `2px solid ${borderColor}` }}>
               <th 
                 style={{ padding: `${spacing[1]} ${spacing[2]} ${spacing[2]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
-                onClick={() => handleSort('year')}
+                onClick={() => handleSort('contractor_name_1')}
               >
-                Year <SortIcon field="year" />
-              </th>
-              <th 
-                style={{ padding: `${spacing[1]} ${spacing[2]} ${spacing[2]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
-                onClick={() => handleSort('description')}
-              >
-                Description <SortIcon field="description" />
+                Contractors <SortIcon field="contractor_name_1" />
               </th>
               <th 
                 style={{ padding: `${spacing[1]} ${spacing[2]} ${spacing[2]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
                 onClick={() => handleSort('implementing_office')}
               >
                 Implementing Office <SortIcon field="implementing_office" />
-              </th>
-              <th 
-                style={{ padding: `${spacing[1]} ${spacing[2]} ${spacing[2]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
-                onClick={() => handleSort('accomplishment_pct')}
-              >
-                Progress <SortIcon field="accomplishment_pct" />
               </th>
               <th 
                 style={{ padding: `${spacing[1]} ${spacing[2]} ${spacing[2]} ${spacing[2]}`, textAlign: 'left', cursor: 'pointer', fontSize: typography.fontSize.xs, fontWeight: 600, color: textSecondary }}
@@ -263,7 +253,17 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                       🔍
                     </button>
                   </td>
-                  <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.sm, color: textPrimary, fontWeight: 600 }}>
+                  <td 
+                    rowSpan={2}
+                    style={{ 
+                      padding: `${spacing[2]} ${spacing[2]}`, 
+                      fontSize: typography.fontSize.sm, 
+                      color: textPrimary, 
+                      fontWeight: 600,
+                      verticalAlign: 'middle',
+                      borderBottom: `1px solid ${borderColor}`
+                    }}
+                  >
                     {contract.contract_id || 'N/A'}
                   </td>
                   <td style={{ 
@@ -272,19 +272,39 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     color: textPrimary, 
                     maxWidth: '400px',
                     overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
                     lineHeight: '1.5',
-                    minHeight: '3em',
                     wordBreak: 'break-word'
                   }}>
-                    {getContractorNames(contract).join(', ') || 'N/A'}
+                    {contract.description || 'N/A'}
                   </td>
-                  <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.sm, color: textPrimary }}>
+                  <td style={{ 
+                    padding: `${spacing[2]} ${spacing[2]}`, 
+                    fontSize: typography.fontSize.sm, 
+                    color: textPrimary,
+                    maxWidth: '200px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as any,
+                    lineHeight: '1.5',
+                    wordBreak: 'break-word'
+                  }}>
                     {contract.region || 'N/A'}
                   </td>
-                  <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs }}>
+                  <td 
+                    rowSpan={2}
+                    style={{ 
+                      padding: `${spacing[2]} ${spacing[2]}`, 
+                      fontSize: typography.fontSize.xs,
+                      verticalAlign: 'middle',
+                      borderBottom: `1px solid ${borderColor}`
+                    }}
+                  >
                     <span style={{
                       padding: '4px 8px',
                       borderRadius: '12px',
@@ -296,7 +316,18 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                       {contract.status || 'N/A'}
                     </span>
                   </td>
-                  <td style={{ padding: `${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.sm, color: textPrimary }}>
+                  <td style={{ 
+                    padding: `${spacing[2]} ${spacing[2]}`, 
+                    fontSize: typography.fontSize.sm, 
+                    color: textPrimary,
+                    maxWidth: '150px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as any,
+                    lineHeight: '1.5'
+                  }}>
                     {formatDate(contract.effectivity_date)}
                   </td>
                   <td 
@@ -335,22 +366,20 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   }}
                   onClick={() => onContractClick?.(contract)}
                 >
-                  <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary }}>
-                    {contract.year || 'N/A'}
-                  </td>
                   <td style={{ 
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
                     fontSize: typography.fontSize.xs, 
-                    color: textSecondary, 
+                    color: textSecondary,
                     maxWidth: '400px',
                     overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
                     lineHeight: '1.5',
                     wordBreak: 'break-word'
                   }}>
-                    {contract.description || 'N/A'}
+                    {getContractorNames(contract).join(', ') || 'N/A'}
                   </td>
                   <td style={{ 
                     padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
@@ -358,6 +387,7 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     color: textSecondary, 
                     maxWidth: '250px',
                     overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
@@ -366,10 +396,18 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                   }}>
                     {contract.implementing_office || 'N/A'}
                   </td>
-                  <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary }}>
-                    {formatPercentage(contract.accomplishment_pct)}
-                  </td>
-                  <td style={{ padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, fontSize: typography.fontSize.xs, color: textSecondary }}>
+                  <td style={{ 
+                    padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
+                    fontSize: typography.fontSize.xs, 
+                    color: textSecondary,
+                    maxWidth: '150px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as any,
+                    lineHeight: '1.5'
+                  }}>
                     {formatDate(contract.expiry_date)}
                   </td>
                 </tr>
