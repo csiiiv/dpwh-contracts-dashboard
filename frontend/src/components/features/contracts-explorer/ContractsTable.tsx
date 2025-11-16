@@ -276,9 +276,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '1.5',
-                    wordBreak: 'break-word',
-                    whiteSpace: 'normal'
+                    lineHeight: '2.0',
+                    wordBreak: 'break-word'
                   }}>
                     {contract.description || 'N/A'}
                   </td>
@@ -362,9 +361,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '1.5',
-                    wordBreak: 'break-word',
-                    whiteSpace: 'normal'
+                    lineHeight: '2.0',
+                    wordBreak: 'break-word'
                   }}>
                     {getContractorNames(contract).join(', ') || 'N/A'}
                   </td>
