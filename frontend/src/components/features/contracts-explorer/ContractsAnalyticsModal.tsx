@@ -867,19 +867,15 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
             window.location.hash = ''
           }}
           title={
-            <div>
-              <div style={{ fontSize: typography.fontSize.xl, fontWeight: 700, marginBottom: spacing[2] }}>
-                📊 {drillDown.breadcrumbs.map(bc => bc.entityName).join(' → ')} - {getTabDisplayName(drillDownActiveTab)} View
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                flexWrap: 'wrap',
-                gap: spacing[2],
-                fontSize: typography.fontSize.sm,
-                opacity: 0.8
-              }}>
-                {drillDown.breadcrumbs.map((bc, index) => (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              flexWrap: 'wrap',
+              gap: spacing[2],
+              fontSize: typography.fontSize.base
+            }}>
+              <span style={{ marginRight: spacing[2] }}>📊</span>
+              {drillDown.breadcrumbs.map((bc, index) => (
                   <React.Fragment key={index}>
                     {index > 0 && (
                       <span style={{ fontWeight: 500 }}>→</span>
@@ -919,6 +915,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                     </button>
                   </React.Fragment>
                 ))}
+                <span style={{ marginLeft: spacing[1], opacity: 0.7 }}>→ {getTabDisplayName(drillDownActiveTab)}</span>
               </div>
             </div>
           }
