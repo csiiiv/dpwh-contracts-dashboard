@@ -118,6 +118,31 @@ export class ContractsParquetService {
   }
 
   /**
+   * Convert BigInt values to Numbers (DuckDB returns BigInt for large integers)
+   */
+  private convertBigIntToNumber(obj: any): any {
+    if (obj === null || obj === undefined) return obj
+    
+    if (typeof obj === 'bigint') {
+      return Number(obj)
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.convertBigIntToNumber(item))
+    }
+    
+    if (typeof obj === 'object') {
+      const converted: any = {}
+      for (const [key, value] of Object.entries(obj)) {
+        converted[key] = this.convertBigIntToNumber(value)
+      }
+      return converted
+    }
+    
+    return obj
+  }
+
+  /**
    * Execute a SQL query and return results as objects
    */
   private async query<T = any>(sql: string): Promise<T[]> {
@@ -127,7 +152,7 @@ export class ContractsParquetService {
 
     console.log('🔍 Executing query:', sql.substring(0, 100) + '...')
     const result = await this.conn.query(sql)
-    const rows = result.toArray().map(row => row.toJSON())
+    const rows = result.toArray().map(row => this.convertBigIntToNumber(row.toJSON()))
     console.log(`✅ Query returned ${rows.length} rows`)
     return rows as T[]
   }
