@@ -1029,7 +1029,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[4] }}>
                   <div>
                     <BodyText $isDark={isDark ?? themeDark} style={{ fontSize: typography.fontSize.lg, fontWeight: 600 }}>
-                      Contracts (Page {drillDownPage} of {drillDownTotalPages})
+                      {getTabDisplayName(drillDownActiveTab)} View (Page {drillDownPage} of {drillDownTotalPages})
                     </BodyText>
                     <BodyText $isDark={isDark ?? themeDark} style={{ fontSize: typography.fontSize.sm, color: 'var(--color-text-secondary)', marginTop: spacing[1] }}>
                       Showing {((drillDownPage - 1) * drillDownPageSize) + 1}-{Math.min(drillDownPage * drillDownPageSize, drillDownContracts.length)} of {drillDownContracts.length}
