@@ -70,15 +70,42 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
   const [entityPage, setEntityPage] = useState(1)
   const entityPageSize = 20
 
+  // Helper function to construct URL with proper query params and hash
+  const buildUrlWithTabParam = useCallback((hash: string, tabParam?: string) => {
+    const currentTab = tabParam || drillDownActiveTab
+    const queryString = currentTab !== 'contracts' ? `?tab=${currentTab}` : ''
+    return `${window.location.pathname}${queryString}${hash}`
+  }, [drillDownActiveTab])
+
+  // Helper function to navigate with tab preservation
+  const navigateWithTab = useCallback((hash: string, tabParam?: string) => {
+    window.location.href = buildUrlWithTabParam(hash, tabParam)
+  }, [buildUrlWithTabParam])
+
   // Hash routing for drill-down with tab parameter support
   React.useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash
+      const fullUrl = window.location.href
       if (!open) return // Don't process if modal is closed
       
-      // Parse URL parameters (e.g., ?tab=regions)
-      const urlParams = new URLSearchParams(window.location.search)
-      const tabParam = urlParams.get('tab') as DrillDownTab | null
+      // Parse hash and query parameters correctly
+      // URL format: /path?tab=regions#analytics/contractor/17267
+      const hashIndex = fullUrl.indexOf('#')
+      const queryIndex = fullUrl.indexOf('?')
+      
+      let hash = ''
+      let searchParams = new URLSearchParams()
+      
+      if (hashIndex !== -1) {
+        hash = fullUrl.substring(hashIndex)
+        // Check if there are query params between ? and #
+        if (queryIndex !== -1 && queryIndex < hashIndex) {
+          const queryString = fullUrl.substring(queryIndex + 1, hashIndex)
+          searchParams = new URLSearchParams(queryString)
+        }
+      }
+      
+      const tabParam = searchParams.get('tab') as DrillDownTab | null
       
       if (hash.startsWith('#analytics/')) {
         // Remove contract details part if present to get the drill-down path
@@ -139,7 +166,12 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
 
     handleHashChange()
     window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
+    // Also listen to popstate for query param changes
+    window.addEventListener('popstate', handleHashChange)
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange)
+      window.removeEventListener('popstate', handleHashChange)
+    }
   }, [open, drillDown.open, drillDown.breadcrumbs, drillDownActiveTab, contracts])
   
   // Get analytics data
@@ -831,11 +863,10 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                     )}
                     <button
                       onClick={() => {
-                        // Navigate to this breadcrumb level
+                        // Navigate to this breadcrumb level, preserving tab parameter
                         const newBreadcrumbs = drillDown.breadcrumbs.slice(0, index + 1)
                         const newHash = '#analytics/' + newBreadcrumbs.map(b => `${b.entityType}/${encodeURIComponent(b.entityId)}`).join('/')
-                        const currentUrl = new URL(window.location.href)
-                        window.location.href = currentUrl.pathname + currentUrl.search + newHash
+                        navigateWithTab(newHash)
                       }}
                       style={{
                         background: 'none',
@@ -931,9 +962,11 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                     if (tab !== 'contracts') setDrillDownPage(1)
                     
                     // Update URL parameter to persist tab selection
-                    const currentUrl = new URL(window.location.href)
-                    currentUrl.searchParams.set('tab', tab)
-                    window.history.replaceState({}, '', currentUrl.toString())
+                    // Format: /path?tab=tabname#hash
+                    const currentHash = window.location.hash
+                    const currentPath = window.location.pathname
+                    const newUrl = `${currentPath}?tab=${tab}${currentHash}`
+                    window.history.replaceState({}, '', newUrl)
                   }}
                   style={{
                     padding: `${spacing[2]} ${spacing[4]}`,
@@ -1222,7 +1255,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                               }
                               
                               const currentPath = drillDown.breadcrumbs.map(bc => `${bc.entityType}/${encodeURIComponent(bc.entityId)}`).join('/')
-                              window.location.hash = `#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}`
+                              navigateWithTab(`#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}`)
                             }
                           }}
                           onMouseEnter={(e) => {
@@ -1258,7 +1291,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                                   }
                                   
                                   const currentPath = drillDown.breadcrumbs.map(bc => `${bc.entityType}/${encodeURIComponent(bc.entityId)}`).join('/')
-                                  window.location.hash = `#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}`
+                                  navigateWithTab(`#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}`)
                                 }
                               }}
                               style={{
