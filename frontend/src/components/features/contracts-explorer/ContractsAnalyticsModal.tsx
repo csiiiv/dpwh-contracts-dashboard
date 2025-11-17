@@ -70,46 +70,36 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
   const [entityPage, setEntityPage] = useState(1)
   const entityPageSize = 20
 
-  // Helper function to construct URL with proper query params and hash
-  const buildUrlWithTabParam = useCallback((hash: string, tabParam?: string) => {
-    const currentTab = tabParam || drillDownActiveTab
-    const queryString = currentTab !== 'contracts' ? `?tab=${currentTab}` : ''
-    return `${window.location.pathname}${queryString}${hash}`
-  }, [drillDownActiveTab])
+  // Sorting state for drill-down tables
+  const [sortField, setSortField] = useState<'name' | 'total_value' | 'count' | 'avg_value'>('total_value')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [contractsSortField, setContractsSortField] = useState<'contract_id' | 'cost_php' | 'year' | 'status'>('cost_php')
+  const [contractsSortDirection, setContractsSortDirection] = useState<'asc' | 'desc'>('desc')
 
-  // Helper function to navigate with tab preservation
+  // Helper function to navigate with tab preservation (hash-only, no reload)
   const navigateWithTab = useCallback((hash: string, tabParam?: string) => {
-    window.location.href = buildUrlWithTabParam(hash, tabParam)
-  }, [buildUrlWithTabParam])
+    const currentTab = tabParam || drillDownActiveTab
+    // Put tab parameter AFTER hash to avoid page reload
+    const hashWithTab = currentTab !== 'contracts' ? `${hash}?tab=${currentTab}` : hash
+    window.location.hash = hashWithTab
+  }, [drillDownActiveTab])
 
   // Hash routing for drill-down with tab parameter support
   React.useEffect(() => {
     const handleHashChange = () => {
-      const fullUrl = window.location.href
       if (!open) return // Don't process if modal is closed
       
       // Parse hash and query parameters correctly
-      // URL format: /path?tab=regions#analytics/contractor/17267
-      const hashIndex = fullUrl.indexOf('#')
-      const queryIndex = fullUrl.indexOf('?')
+      // URL format: /path#analytics/contractor/17267?tab=regions
+      const hash = window.location.hash
       
-      let hash = ''
-      let searchParams = new URLSearchParams()
+      // Split hash and query params (after hash)
+      const [hashPath, hashQuery] = hash.split('?')
+      const tabParam = hashQuery ? new URLSearchParams(hashQuery).get('tab') as DrillDownTab | null : null
       
-      if (hashIndex !== -1) {
-        hash = fullUrl.substring(hashIndex)
-        // Check if there are query params between ? and #
-        if (queryIndex !== -1 && queryIndex < hashIndex) {
-          const queryString = fullUrl.substring(queryIndex + 1, hashIndex)
-          searchParams = new URLSearchParams(queryString)
-        }
-      }
-      
-      const tabParam = searchParams.get('tab') as DrillDownTab | null
-      
-      if (hash.startsWith('#analytics/')) {
+      if (hashPath.startsWith('#analytics/')) {
         // Remove contract details part if present to get the drill-down path
-        const analyticsPath = hash.split('/contract/')[0]
+        const analyticsPath = hashPath.split('/contract/')[0]
         const parts = analyticsPath.replace('#analytics/', '').split('/')
         
         // Parse breadcrumbs from hash path (type/id/type/id/...)
@@ -145,11 +135,12 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
             setDrillDown({ open: true, breadcrumbs: newBreadcrumbs })
           }
           
-          // Set active tab from URL parameter if provided
+          // Set active tab from URL parameter
           if (tabParam && ['contracts', 'contractors', 'regions', 'offices', 'statuses', 'funds'].includes(tabParam)) {
-            if (drillDownActiveTab !== tabParam) {
-              setDrillDownActiveTab(tabParam)
-            }
+            setDrillDownActiveTab(tabParam)
+          } else if (!tabParam) {
+            // No tab param means default to contracts
+            setDrillDownActiveTab('contracts')
           }
         } else {
           // Just #analytics with no drill-down
@@ -157,7 +148,13 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
             setDrillDown({ open: false, breadcrumbs: [] })
           }
         }
-      } else if (hash === '#analytics') {
+      } else if (hashPath === '#analytics') {
+        // Just #analytics with no drill-down
+        if (drillDown.open) {
+          setDrillDown({ open: false, breadcrumbs: [] })
+        }
+      } else {
+        // No hash or non-analytics hash - close drill-down if open
         if (drillDown.open) {
           setDrillDown({ open: false, breadcrumbs: [] })
         }
@@ -166,13 +163,12 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
 
     handleHashChange()
     window.addEventListener('hashchange', handleHashChange)
-    // Also listen to popstate for query param changes
     window.addEventListener('popstate', handleHashChange)
     return () => {
       window.removeEventListener('hashchange', handleHashChange)
       window.removeEventListener('popstate', handleHashChange)
     }
-  }, [open, drillDown.open, drillDown.breadcrumbs, drillDownActiveTab, contracts])
+  }, [open, contracts]) // Removed drillDown dependencies to prevent loops
   
   // Get analytics data
   const { processedData, summaryStats, aggregates, loading } = useContractsAnalytics(
@@ -366,19 +362,48 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
       .sort((a, b) => a.year - b.year)
   }, [drillDown.open, drillDownContracts])
 
-  // Paginated drill-down contracts
+  // Paginated drill-down contracts with sorting
   const paginatedDrillDownContracts = useMemo(() => {
+    // Apply sorting
+    const sorted = [...drillDownContracts].sort((a, b) => {
+      let aVal: any, bVal: any
+      
+      switch (contractsSortField) {
+        case 'contract_id':
+          aVal = String(a.contract_id || '').toLowerCase()
+          bVal = String(b.contract_id || '').toLowerCase()
+          return contractsSortDirection === 'asc' 
+            ? aVal.localeCompare(bVal)
+            : bVal.localeCompare(aVal)
+        case 'cost_php':
+          aVal = a.cost_php || 0
+          bVal = b.cost_php || 0
+          return contractsSortDirection === 'asc' ? aVal - bVal : bVal - aVal
+        case 'year':
+          aVal = a.year || 0
+          bVal = b.year || 0
+          return contractsSortDirection === 'asc' ? aVal - bVal : bVal - aVal
+        case 'status':
+          aVal = String(a.status || '').toLowerCase()
+          bVal = String(b.status || '').toLowerCase()
+          return contractsSortDirection === 'asc'
+            ? aVal.localeCompare(bVal)
+            : bVal.localeCompare(aVal)
+        default:
+          return 0
+      }
+    })
+    
     const start = (drillDownPage - 1) * drillDownPageSize
     const end = start + drillDownPageSize
-    return drillDownContracts.slice(start, end)
-  }, [drillDownContracts, drillDownPage])
+    return sorted.slice(start, end)
+  }, [drillDownContracts, drillDownPage, contractsSortField, contractsSortDirection])
 
   const drillDownTotalPages = Math.ceil(drillDownContracts.length / drillDownPageSize)
 
-  // Reset drill-down page when breadcrumbs change
+  // Reset drill-down page when breadcrumbs change (but preserve tab if in URL)
   React.useEffect(() => {
     setDrillDownPage(1)
-    setDrillDownActiveTab('contracts')
     setEntityPage(1)
   }, [drillDown.breadcrumbs])
 
@@ -400,13 +425,31 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
 
   // Get entity data for current tab
   const currentEntityData = useMemo(() => {
-    if (drillDownActiveTab === 'contractors') return drillDownRelatedAggregates.by_contractor
-    if (drillDownActiveTab === 'regions') return drillDownRelatedAggregates.by_region
-    if (drillDownActiveTab === 'offices') return drillDownRelatedAggregates.by_implementing_office
-    if (drillDownActiveTab === 'statuses') return drillDownRelatedAggregates.by_status
-    if (drillDownActiveTab === 'funds') return drillDownRelatedAggregates.by_source_of_funds
-    return []
-  }, [drillDownActiveTab, drillDownRelatedAggregates])
+    let data = []
+    if (drillDownActiveTab === 'contractors') data = drillDownRelatedAggregates.by_contractor
+    else if (drillDownActiveTab === 'regions') data = drillDownRelatedAggregates.by_region
+    else if (drillDownActiveTab === 'offices') data = drillDownRelatedAggregates.by_implementing_office
+    else if (drillDownActiveTab === 'statuses') data = drillDownRelatedAggregates.by_status
+    else if (drillDownActiveTab === 'funds') data = drillDownRelatedAggregates.by_source_of_funds
+    
+    // Apply sorting
+    const sorted = [...data].sort((a, b) => {
+      let aVal = a[sortField]
+      let bVal = b[sortField]
+      
+      if (sortField === 'name') {
+        aVal = String(aVal || '').toLowerCase()
+        bVal = String(bVal || '').toLowerCase()
+        return sortDirection === 'asc' 
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal)
+      }
+      
+      return sortDirection === 'asc' ? aVal - bVal : bVal - aVal
+    })
+    
+    return sorted
+  }, [drillDownActiveTab, drillDownRelatedAggregates, sortField, sortDirection])
 
   // Paginated entity data
   const paginatedEntityData = useMemo(() => {
@@ -508,12 +551,8 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
       <Modal
         open={open && !drillDown.open}
         onClose={() => {
-          // Clear hash and close modal
-          if (window.location.hash) {
-            window.location.hash = ''
-          } else {
-            onClose()
-          }
+          // Clear hash - this will trigger parent's hashchange to close modal
+          window.location.hash = ''
         }}
         title="📊 Analytics Overview"
         size="xlarge"
@@ -824,9 +863,8 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
         <Modal
           open={drillDown.open}
           onClose={() => {
-            // Close button returns to main page (clears hash)
+            // Clear hash - this will trigger parent's hashchange to close all modals
             window.location.hash = ''
-            onClose()
           }}
           title="" // We'll add custom header below
           size="xlarge"
@@ -961,12 +999,12 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                     setEntityPage(1)
                     if (tab !== 'contracts') setDrillDownPage(1)
                     
-                    // Update URL parameter to persist tab selection
-                    // Format: /path?tab=tabname#hash
+                    // Update hash query parameter to persist tab selection (no page reload)
+                    // Format: #analytics/path?tab=tabname
                     const currentHash = window.location.hash
-                    const currentPath = window.location.pathname
-                    const newUrl = `${currentPath}?tab=${tab}${currentHash}`
-                    window.history.replaceState({}, '', newUrl)
+                    const [hashPath] = currentHash.split('?')
+                    const newHash = tab !== 'contracts' ? `${hashPath}?tab=${tab}` : hashPath
+                    window.location.hash = newHash
                   }}
                   style={{
                     padding: `${spacing[2]} ${spacing[4]}`,
@@ -1022,20 +1060,60 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                     <thead>
                       <tr style={{ borderBottom: `2px solid var(--color-border-light)` }}>
                         <th style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, width: '40px' }}></th>
-                        <th style={{ padding: spacing[3], textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Contract ID
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (contractsSortField === 'contract_id') {
+                              setContractsSortDirection(contractsSortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setContractsSortField('contract_id')
+                              setContractsSortDirection('asc')
+                            }
+                          }}
+                        >
+                          Contract ID {contractsSortField === 'contract_id' && (contractsSortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                         <th style={{ padding: spacing[3], textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
                           Description
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Cost
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (contractsSortField === 'cost_php') {
+                              setContractsSortDirection(contractsSortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setContractsSortField('cost_php')
+                              setContractsSortDirection('desc')
+                            }
+                          }}
+                        >
+                          Cost {contractsSortField === 'cost_php' && (contractsSortDirection === 'asc' ? '↑' : '↓')}
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Status
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (contractsSortField === 'status') {
+                              setContractsSortDirection(contractsSortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setContractsSortField('status')
+                              setContractsSortDirection('asc')
+                            }
+                          }}
+                        >
+                          Status {contractsSortField === 'status' && (contractsSortDirection === 'asc' ? '↑' : '↓')}
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Year
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (contractsSortField === 'year') {
+                              setContractsSortDirection(contractsSortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setContractsSortField('year')
+                              setContractsSortDirection('desc')
+                            }
+                          }}
+                        >
+                          Year {contractsSortField === 'year' && (contractsSortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                       </tr>
                     </thead>
@@ -1211,17 +1289,61 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                         <th style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, width: '60px' }}>
                           Rank
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Name
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (sortField === 'name') {
+                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setSortField('name')
+                              setSortDirection('asc')
+                            }
+                            setEntityPage(1)
+                          }}
+                        >
+                          Name {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Total Value
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (sortField === 'total_value') {
+                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setSortField('total_value')
+                              setSortDirection('desc')
+                            }
+                            setEntityPage(1)
+                          }}
+                        >
+                          Total Value {sortField === 'total_value' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Count
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (sortField === 'count') {
+                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setSortField('count')
+                              setSortDirection('desc')
+                            }
+                            setEntityPage(1)
+                          }}
+                        >
+                          Count {sortField === 'count' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
-                        <th style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm }}>
-                          Avg Value
+                        <th 
+                          style={{ padding: spacing[3], textAlign: 'right', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
+                          onClick={() => {
+                            if (sortField === 'avg_value') {
+                              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                            } else {
+                              setSortField('avg_value')
+                              setSortDirection('desc')
+                            }
+                            setEntityPage(1)
+                          }}
+                        >
+                          Avg Value {sortField === 'avg_value' && (sortDirection === 'asc' ? '↑' : '↓')}
                         </th>
                       </tr>
                     </thead>
@@ -1235,7 +1357,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                             transition: 'background-color 0.15s'
                           }}
                           onClick={() => {
-                            // Append to breadcrumb trail
+                            // Append to breadcrumb trail (explicitly set contracts tab)
                             const entityTypeMap = {
                               'contractors': 'contractor',
                               'regions': 'region',
@@ -1255,7 +1377,8 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                               }
                               
                               const currentPath = drillDown.breadcrumbs.map(bc => `${bc.entityType}/${encodeURIComponent(bc.entityId)}`).join('/')
-                              navigateWithTab(`#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}`)
+                              // Navigate with explicit contracts tab
+                              window.location.hash = `#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}?tab=contracts`
                             }
                           }}
                           onMouseEnter={(e) => {
@@ -1291,7 +1414,8 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                                   }
                                   
                                   const currentPath = drillDown.breadcrumbs.map(bc => `${bc.entityType}/${encodeURIComponent(bc.entityId)}`).join('/')
-                                  navigateWithTab(`#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}`)
+                                  // Navigate with explicit contracts tab
+                                  window.location.hash = `#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}?tab=contracts`
                                 }
                               }}
                               style={{

@@ -5,9 +5,11 @@
 import * as duckdb from '@duckdb/duckdb-wasm'
 import duckdb_wasm from '@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url'
 import duckdb_wasm_eh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url'
+import { get, set } from 'idb-keyval'
 import type { Contract } from '../types/contracts'
 
 const PARQUET_URL = '/contracts_all_years_all_offices.parquet'
+const PARQUET_CACHE_KEY = 'duckdb_parquet_buffer_v1'
 
 export interface ContractsMetadata {
   lastUpdated: string
@@ -85,16 +87,28 @@ export class ContractsParquetService {
       this.conn = await this.db.connect()
       console.log('✅ DuckDB connection established')
 
-      // Fetch and register the Parquet file
-      console.log('📥 Fetching Parquet file from:', PARQUET_URL)
-      const response = await fetch(PARQUET_URL)
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Parquet file: ${response.status} ${response.statusText}`)
-      }
+      // Try to get Parquet file from cache first
+      console.log('📥 Checking for cached Parquet file...')
+      let uint8Array: Uint8Array | undefined = await get(PARQUET_CACHE_KEY)
+      
+      if (!uint8Array) {
+        console.log('📥 Fetching Parquet file from:', PARQUET_URL)
+        const response = await fetch(PARQUET_URL)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch Parquet file: ${response.status} ${response.statusText}`)
+        }
 
-      const arrayBuffer = await response.arrayBuffer()
-      const uint8Array = new Uint8Array(arrayBuffer)
-      console.log(`✅ Parquet file loaded: ${(uint8Array.length / 1024 / 1024).toFixed(2)} MB`)
+        const arrayBuffer = await response.arrayBuffer()
+        uint8Array = new Uint8Array(arrayBuffer)
+        console.log(`✅ Parquet file loaded: ${(uint8Array.length / 1024 / 1024).toFixed(2)} MB`)
+        
+        // Cache the file buffer for next time
+        console.log('💾 Caching Parquet file buffer...')
+        await set(PARQUET_CACHE_KEY, uint8Array)
+        console.log('✅ Parquet file cached')
+      } else {
+        console.log(`✅ Using cached Parquet file: ${(uint8Array.length / 1024 / 1024).toFixed(2)} MB`)
+      }
 
       // Register the file in DuckDB
       await this.db.registerFileBuffer('contracts.parquet', uint8Array)
