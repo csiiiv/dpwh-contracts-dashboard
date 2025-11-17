@@ -970,19 +970,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
               </div>
             </Card>
 
-            {/* Yearly Trends Chart */}
-            {drillDownYearlyData.length > 0 && (
-              <Card $isDark={isDark ?? themeDark} style={{ marginBottom: spacing[6], padding: spacing[4] }}>
-                <BodyText $isDark={isDark ?? themeDark} style={{ fontSize: typography.fontSize.lg, fontWeight: 600, marginBottom: spacing[4] }}>
-                  Yearly Trends
-                </BodyText>
-                <QuarterlyTrendsChart
-                  data={drillDownYearlyData}
-                  timeGranularity="yearly"
-                  isDark={isDark ?? themeDark}
-                />
-              </Card>
-            )}
+            {/* Yearly Trends Chart removed from view */}
 
             {/* Tabs */}
             <div style={{ 
