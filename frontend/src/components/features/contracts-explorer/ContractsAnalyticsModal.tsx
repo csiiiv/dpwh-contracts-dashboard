@@ -866,38 +866,23 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
             // Clear hash - this will trigger parent's hashchange to close all modals
             window.location.hash = ''
           }}
-          title="" // We'll add custom header below
-          size="xlarge"
-          isDark={isDark ?? themeDark}
-          zIndex={10001}
-        >
-          <div style={{ padding: spacing[6], maxHeight: '75vh', overflowY: 'auto' }}>
-            {/* Breadcrumb Navigation */}
-            <div style={{ 
-              marginBottom: spacing[4], 
-              paddingBottom: spacing[3],
-              borderBottom: `2px solid ${vars.border}`
-            }}>
-              <div style={{ 
-                fontSize: typography.fontSize.xl, 
-                fontWeight: 700, 
-                color: vars.text,
-                marginBottom: spacing[2]
-              }}>
-                📊 Drill-Down Analytics
+          title={
+            <div>
+              <div style={{ fontSize: typography.fontSize.xl, fontWeight: 700, marginBottom: spacing[2] }}>
+                📊 {drillDown.breadcrumbs.map(bc => bc.entityName).join(' → ')} - {getTabDisplayName(drillDownActiveTab)} View
               </div>
               <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 flexWrap: 'wrap',
                 gap: spacing[2],
-                fontSize: typography.fontSize.base,
-                color: vars.textSecondary
+                fontSize: typography.fontSize.sm,
+                opacity: 0.8
               }}>
                 {drillDown.breadcrumbs.map((bc, index) => (
                   <React.Fragment key={index}>
                     {index > 0 && (
-                      <span style={{ color: vars.textTertiary, fontWeight: 500 }}>→</span>
+                      <span style={{ fontWeight: 500 }}>→</span>
                     )}
                     <button
                       onClick={() => {
@@ -909,18 +894,18 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                       style={{
                         background: 'none',
                         border: 'none',
-                        color: index === drillDown.breadcrumbs.length - 1 ? vars.text : vars.primary,
+                        color: 'inherit',
                         fontWeight: index === drillDown.breadcrumbs.length - 1 ? 700 : 500,
                         cursor: index === drillDown.breadcrumbs.length - 1 ? 'default' : 'pointer',
                         textDecoration: 'none',
                         padding: `${spacing[1]} ${spacing[2]}`,
                         borderRadius: '4px',
                         transition: 'all 0.2s',
-                        fontSize: typography.fontSize.base
+                        fontSize: 'inherit'
                       }}
                       onMouseEnter={(e) => {
                         if (index !== drillDown.breadcrumbs.length - 1) {
-                          e.currentTarget.style.backgroundColor = vars.backgroundSecondary
+                          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'
                           e.currentTarget.style.textDecoration = 'underline'
                         }
                       }}
@@ -936,6 +921,12 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                 ))}
               </div>
             </div>
+          }
+          size="xlarge"
+          isDark={isDark ?? themeDark}
+          zIndex={10001}
+        >
+          <div style={{ padding: spacing[6], maxHeight: '75vh', overflowY: 'auto' }}>
             {/* Drill-down Summary */}
             <Card $isDark={isDark ?? themeDark} style={{ marginBottom: spacing[6], padding: spacing[4] }}>
               <div style={{ 
