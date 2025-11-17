@@ -1286,9 +1286,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: `2px solid var(--color-border-light)` }}>
-                        <th style={{ padding: spacing[3], textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, width: '60px' }}>
-                          Rank
-                        </th>
+                        {/* Rank column removed for entity data tabs */}
                         <th 
                           style={{ padding: spacing[3], textAlign: 'left', color: 'var(--color-text-secondary)', fontSize: typography.fontSize.sm, cursor: 'pointer', userSelect: 'none' }}
                           onClick={() => {
@@ -1375,7 +1373,6 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                                   entityId = contract.contractor_id_1
                                 }
                               }
-                              
                               const currentPath = drillDown.breadcrumbs.map(bc => `${bc.entityType}/${encodeURIComponent(bc.entityId)}`).join('/')
                               // Navigate with explicit contracts tab
                               window.location.hash = `#analytics/${currentPath}/${newEntityType}/${encodeURIComponent(entityId)}?tab=contracts`
@@ -1388,9 +1385,8 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                             e.currentTarget.style.backgroundColor = 'transparent'
                           }}
                         >
-                          <td style={{ padding: spacing[3], textAlign: 'center', fontSize: typography.fontSize.sm, color: 'var(--color-text-primary)' }}>
-                            #{((entityPage - 1) * entityPageSize) + index + 1}
-                          </td>
+                          {/* Rank column removed for entity data tabs */}
+                          <td style={{ display: 'none' }}></td>
                           <td style={{ padding: spacing[3], fontSize: typography.fontSize.sm }}>
                             <button
                               onClick={(e) => {
