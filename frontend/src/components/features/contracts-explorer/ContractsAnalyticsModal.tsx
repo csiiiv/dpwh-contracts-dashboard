@@ -874,49 +874,47 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
               gap: spacing[2],
               fontSize: typography.fontSize.base
             }}>
-              <span style={{ marginRight: spacing[2] }}>📊</span>
+              📊
               {drillDown.breadcrumbs.map((bc, index) => (
-                  <React.Fragment key={index}>
-                    {index > 0 && (
-                      <span style={{ fontWeight: 500 }}>→</span>
-                    )}
-                    <button
-                      onClick={() => {
-                        // Navigate to this breadcrumb level, preserving tab parameter
-                        const newBreadcrumbs = drillDown.breadcrumbs.slice(0, index + 1)
-                        const newHash = '#analytics/' + newBreadcrumbs.map(b => `${b.entityType}/${encodeURIComponent(b.entityId)}`).join('/')
-                        navigateWithTab(newHash)
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'inherit',
-                        fontWeight: index === drillDown.breadcrumbs.length - 1 ? 700 : 500,
-                        cursor: index === drillDown.breadcrumbs.length - 1 ? 'default' : 'pointer',
-                        textDecoration: 'none',
-                        padding: `${spacing[1]} ${spacing[2]}`,
-                        borderRadius: '4px',
-                        transition: 'all 0.2s',
-                        fontSize: 'inherit'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (index !== drillDown.breadcrumbs.length - 1) {
-                          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'
-                          e.currentTarget.style.textDecoration = 'underline'
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent'
-                        e.currentTarget.style.textDecoration = 'none'
-                      }}
-                      disabled={index === drillDown.breadcrumbs.length - 1}
-                    >
-                      {bc.entityName}
-                    </button>
-                  </React.Fragment>
-                ))}
-                <span style={{ marginLeft: spacing[1], opacity: 0.7 }}>→ {getTabDisplayName(drillDownActiveTab)}</span>
-              </div>
+                <React.Fragment key={index}>
+                  <span style={{ fontWeight: 500, opacity: 0.6 }}>→</span>
+                  <button
+                    onClick={() => {
+                      // Navigate to this breadcrumb level, preserving tab parameter
+                      const newBreadcrumbs = drillDown.breadcrumbs.slice(0, index + 1)
+                      const newHash = '#analytics/' + newBreadcrumbs.map(b => `${b.entityType}/${encodeURIComponent(b.entityId)}`).join('/')
+                      navigateWithTab(newHash)
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'inherit',
+                      fontWeight: index === drillDown.breadcrumbs.length - 1 ? 700 : 500,
+                      cursor: index === drillDown.breadcrumbs.length - 1 ? 'default' : 'pointer',
+                      textDecoration: 'none',
+                      padding: `${spacing[1]} ${spacing[2]}`,
+                      borderRadius: '4px',
+                      transition: 'all 0.2s',
+                      fontSize: 'inherit'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (index !== drillDown.breadcrumbs.length - 1) {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)'
+                        e.currentTarget.style.textDecoration = 'underline'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.textDecoration = 'none'
+                    }}
+                    disabled={index === drillDown.breadcrumbs.length - 1}
+                  >
+                    {bc.entityName}
+                  </button>
+                </React.Fragment>
+              ))}
+              <span style={{ fontWeight: 500, opacity: 0.6 }}>→</span>
+              <span style={{ fontWeight: 600 }}>{getTabDisplayName(drillDownActiveTab)}</span>
             </div>
           }
           size="xlarge"
