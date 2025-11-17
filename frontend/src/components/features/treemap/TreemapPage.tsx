@@ -35,6 +35,9 @@ export const TreemapPage: React.FC = () => {
   const themeColors = getThemeColors(isDark)
   const { contracts, loading: dataLoading, error: dataError } = useContractsData()
   
+  // Prevent modals from opening while data is loading
+  const canOpenModals = !dataLoading
+  
   // State
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -54,6 +57,12 @@ export const TreemapPage: React.FC = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash
+      
+      // Don't open modals while data is loading
+      if (!canOpenModals) {
+        return
+      }
+      
       if (hash.startsWith('#contract/')) {
         const contractId = hash.replace('#contract/', '')
         const contract = contracts.find(c => c.contract_id === contractId)
@@ -66,7 +75,7 @@ export const TreemapPage: React.FC = () => {
     handleHashChange()
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [contracts])
+  }, [contracts, canOpenModals])
 
   // Hierarchy configurations for DPWH data (memoized to prevent infinite loops)
   const hierarchies = useMemo<HierarchyConfig[]>(() => [

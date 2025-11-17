@@ -29,6 +29,9 @@ export const ContractsExplorer: React.FC = () => {
   // Load contracts data
   const { contracts, loading, loadingStage, error, filterOptions, reload } = useContractsData()
 
+  // Prevent modals from opening while data is loading
+  const canOpenModals = !loading
+
   // Filter state (immediate, not debounced)
   const [filters, setFilters] = useState<ContractFilters>({
     regions: [],
@@ -90,6 +93,11 @@ export const ContractsExplorer: React.FC = () => {
     const handleHashChange = () => {
       const hash = window.location.hash
       
+      // Don't open modals while data is loading
+      if (!canOpenModals) {
+        return
+      }
+      
       if (hash === '#analytics') {
         if (!analyticsOpen) setAnalyticsOpen(true)
         if (selectedContract) setSelectedContract(null)
@@ -132,7 +140,7 @@ export const ContractsExplorer: React.FC = () => {
     handleHashChange() // Check on mount
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [contracts, analyticsOpen, selectedContract])
+  }, [contracts, analyticsOpen, selectedContract, canOpenModals])
 
   // Apply filters and sorting (using debounced values)
   const filteredContracts = useContractFilters(contracts, debouncedFilters, debouncedSortConfig)

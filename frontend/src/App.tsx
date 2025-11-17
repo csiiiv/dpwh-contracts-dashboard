@@ -26,12 +26,14 @@ import {
 import Header from './components/ui/Header'
 import './App.css'
 import './styles/theme.css'
-import { ContractsDataProvider } from './contexts/ContractsDataContext'
+import { ContractsDataProvider, useContractsData } from './contexts/ContractsDataContext'
+import { DataLoadingModal } from './components/features/shared/DataLoadingModal'
 
 const AppContent: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { isDark } = useTheme()
+  const { loading, loadingStage } = useContractsData()
   
   // Performance monitoring
   usePerformanceMonitoring('AppContent')
@@ -68,6 +70,13 @@ const AppContent: React.FC = () => {
 
   return (
     <AppContainer $isDark={isDark}>
+      {/* Data Loading Modal - Shows on top of everything */}
+      <DataLoadingModal 
+        isOpen={loading} 
+        loadingStage={loadingStage}
+        message="Loading DPWH Contracts Dataset"
+      />
+
       {/* Header */}
       <Header />
 
