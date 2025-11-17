@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { loadContractsAndAggregates, ContractAggregates } from '../utils/contractsDataLoader'
+import { loadContractsAndAggregatesParquet } from '../utils/contractsDataLoaderParquet'
 import type { Contract } from '../types/contracts'
+import type { ContractAggregates } from '../services/ContractsParquetService'
 
 interface ContractsDataContextValue {
   contracts: Contract[]
@@ -21,12 +22,12 @@ export const ContractsDataProvider = ({ children }: { children: ReactNode }) => 
   const [error, setError] = useState<string | null>(null)
 
   const loadData = async (forceReload = false) => {
-    console.log('🚀 ContractsDataContext: Loading data, forceReload:', forceReload)
+    console.log('🚀 ContractsDataContext: Loading data (Parquet), forceReload:', forceReload)
     setLoading(true)
     setError(null)
     try {
-      const { contracts, aggregates } = await loadContractsAndAggregates(forceReload, setLoadingStage)
-      console.log('✅ ContractsDataContext: Loaded', contracts.length, 'contracts')
+      const { contracts, aggregates } = await loadContractsAndAggregatesParquet(forceReload, setLoadingStage)
+      console.log('✅ ContractsDataContext: Loaded', contracts.length, 'contracts from Parquet')
       setContracts(contracts)
       setAggregates(aggregates)
       setLoadingStage('Complete')

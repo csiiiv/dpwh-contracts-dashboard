@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parquet Migration Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .status {
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .status.loading {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .stat-card {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 4px;
+      border-left: 4px solid #007bff;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 24px;
+      color: #333;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      margin-right: 8px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    .log {
+      margin-top: 20px;
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    .log-entry {
+      margin: 4px 0;
+      padding: 4px;
+    }
+    .log-entry.info {
+      color: #0056b3;
+    }
+    .log-entry.success {
+      color: #28a745;
+    }
+    .log-entry.error {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🦆 Parquet Migration Test</h1>
+    <p>Testing DuckDB-WASM with Parquet data loading</p>
+    
+    <div id="status" class="status loading">
+      ⏳ Initializing...
+    </div>
+    
+    <div style="margin: 20px 0;">
+      <button id="loadBtn" onclick="loadData()">Load Data</button>
+      <button id="queryBtn" onclick="runQuery()" disabled>Run Sample Query</button>
+      <button id="filterBtn" onclick="filterData()" disabled>Test Filters</button>
+    </div>
+    
+    <div class="stats" id="stats"></div>
+    
+    <div class="log" id="log"></div>
+  </div>
+
+  <script type="module">
+    import { contractsParquetService } from './src/services/ContractsParquetService.ts'
+    
+    window.service = contractsParquetService
+    window.contracts = null
+    window.aggregates = null
+    
+    function updateStatus(message, type = 'loading') {
+      const status = document.getElementById('status')
+      status.className = `status ${type}`
+      status.innerHTML = type === 'loading' ? '⏳ ' + message : 
+                         type === 'success' ? '✅ ' + message : 
+                         '❌ ' + message
+    }
+    
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log')
+      const entry = document.createElement('div')
+      entry.className = `log-entry ${type}`
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`
+      logDiv.appendChild(entry)
+      logDiv.scrollTop = logDiv.scrollHeight
+    }
+    
+    function displayStats(contracts, aggregates) {
+      const statsDiv = document.getElementById('stats')
+      statsDiv.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">Total Contracts</div>
+          <div class="stat-value">${contracts.length.toLocaleString()}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Regions</div>
+          <div class="stat-value">${aggregates.regions.length}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Contractors</div>
+          <div class="stat-value">${aggregates.contractors.length}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Years</div>
+          <div class="stat-value">${aggregates.years.length}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Value</div>
+          <div class="stat-value">₱${(contracts.reduce((sum, c) => sum + (c.cost_php || 0), 0) / 1e9).toFixed(2)}B</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Cost</div>
+          <div class="stat-value">₱${(contracts.reduce((sum, c) => sum + (c.cost_php || 0), 0) / contracts.length / 1e6).toFixed(2)}M</div>
+        </div>
+      `
+    }
+    
+    window.loadData = async function() {
+      try {
+        updateStatus('Initializing DuckDB-WASM...', 'loading')
+        log('Starting data load...', 'info')
+        
+        const startTime = performance.now()
+        
+        await window.service.initialize()
+        log('DuckDB initialized', 'success')
+        
+        updateStatus('Loading contracts from Parquet...', 'loading')
+        window.contracts = await window.service.loadContracts()
+        log(`Loaded ${window.contracts.length} contracts`, 'success')
+        
+        updateStatus('Computing aggregates...', 'loading')
+        window.aggregates = await window.service.getAggregates()
+        log('Aggregates computed', 'success')
+        
+        const endTime = performance.now()
+        const duration = ((endTime - startTime) / 1000).toFixed(2)
+        
+        updateStatus(`Data loaded successfully in ${duration}s`, 'success')
+        log(`Total load time: ${duration}s`, 'success')
+        
+        displayStats(window.contracts, window.aggregates)
+        
+        document.getElementById('queryBtn').disabled = false
+        document.getElementById('filterBtn').disabled = false
+        document.getElementById('loadBtn').disabled = true
+        
+      } catch (error) {
+        updateStatus('Error loading data: ' + error.message, 'error')
+        log('Error: ' + error.message, 'error')
+        console.error(error)
+      }
+    }
+    
+    window.runQuery = async function() {
+      try {
+        log('Running sample query...', 'info')
+        const stats = await window.service.getSummaryStats()
+        log(`Total Contracts: ${stats.totalContracts}`, 'success')
+        log(`Total Value: ₱${(stats.totalValue / 1e9).toFixed(2)}B`, 'success')
+        log(`Avg Value: ₱${(stats.avgValue / 1e6).toFixed(2)}M`, 'success')
+        log(`Completed: ${stats.completedContracts}`, 'success')
+        log(`Ongoing: ${stats.ongoingContracts}`, 'success')
+      } catch (error) {
+        log('Query error: ' + error.message, 'error')
+      }
+    }
+    
+    window.filterData = async function() {
+      try {
+        log('Testing filters...', 'info')
+        const startTime = performance.now()
+        
+        const filtered = await window.service.getFilteredContracts({
+          years: [2023, 2024],
+          minCost: 1000000,
+          searchTerm: 'road'
+        })
+        
+        const endTime = performance.now()
+        const duration = ((endTime - startTime)).toFixed(2)
+        
+        log(`Filtered to ${filtered.length} contracts in ${duration}ms`, 'success')
+        log(`Example: ${filtered[0]?.description?.substring(0, 50)}...`, 'info')
+      } catch (error) {
+        log('Filter error: ' + error.message, 'error')
+      }
+    }
+    
+    log('Page loaded. Click "Load Data" to start.', 'info')
+  </script>
+</body>
+</html>

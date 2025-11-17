@@ -17,6 +17,15 @@ export default defineConfig(({ mode }) => {
         ],
       },
     plugins: [react()],
+    optimizeDeps: {
+      exclude: ['@duckdb/duckdb-wasm'],
+      esbuildOptions: {
+        target: 'esnext',
+      },
+    },
+    worker: {
+      format: 'es',
+    },
     build: {
       rollupOptions: {
         output: {
@@ -34,6 +43,8 @@ export default defineConfig(({ mode }) => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Cross-Origin-Opener-Policy': 'same-origin',
       },
       proxy: {
         '/api': {
