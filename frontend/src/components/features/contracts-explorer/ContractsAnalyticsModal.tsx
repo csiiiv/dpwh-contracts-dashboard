@@ -70,11 +70,15 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
   const [entityPage, setEntityPage] = useState(1)
   const entityPageSize = 20
 
-  // Hash routing for drill-down
+  // Hash routing for drill-down with tab parameter support
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash
       if (!open) return // Don't process if modal is closed
+      
+      // Parse URL parameters (e.g., ?tab=regions)
+      const urlParams = new URLSearchParams(window.location.search)
+      const tabParam = urlParams.get('tab') as DrillDownTab | null
       
       if (hash.startsWith('#analytics/')) {
         // Remove contract details part if present to get the drill-down path
@@ -113,6 +117,13 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
           if (!drillDown.open || isDifferent) {
             setDrillDown({ open: true, breadcrumbs: newBreadcrumbs })
           }
+          
+          // Set active tab from URL parameter if provided
+          if (tabParam && ['contracts', 'contractors', 'regions', 'offices', 'statuses', 'funds'].includes(tabParam)) {
+            if (drillDownActiveTab !== tabParam) {
+              setDrillDownActiveTab(tabParam)
+            }
+          }
         } else {
           // Just #analytics with no drill-down
           if (drillDown.open) {
@@ -129,7 +140,7 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
     handleHashChange()
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [open, drillDown.open, drillDown.breadcrumbs, contracts])
+  }, [open, drillDown.open, drillDown.breadcrumbs, drillDownActiveTab, contracts])
   
   // Get analytics data
   const { processedData, summaryStats, aggregates, loading } = useContractsAnalytics(
@@ -781,22 +792,81 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
         <Modal
           open={drillDown.open}
           onClose={() => {
-            if (drillDown.breadcrumbs.length > 1) {
-              // Remove last breadcrumb level
-              const newBreadcrumbs = drillDown.breadcrumbs.slice(0, -1)
-              const newHash = '#analytics/' + newBreadcrumbs.map(bc => `${bc.entityType}/${encodeURIComponent(bc.entityId)}`).join('/')
-              window.location.hash = newHash
-            } else {
-              // Close to main analytics
-              window.location.hash = '#analytics'
-            }
+            // Close button returns to main page (clears hash)
+            window.location.hash = ''
+            onClose()
           }}
-          title={`📊 ${drillDown.breadcrumbs.map(bc => bc.entityName).join(' → ')} - Detailed View`}
+          title="" // We'll add custom header below
           size="xlarge"
           isDark={isDark ?? themeDark}
           zIndex={10001}
         >
           <div style={{ padding: spacing[6], maxHeight: '75vh', overflowY: 'auto' }}>
+            {/* Breadcrumb Navigation */}
+            <div style={{ 
+              marginBottom: spacing[4], 
+              paddingBottom: spacing[3],
+              borderBottom: `2px solid ${vars.border}`
+            }}>
+              <div style={{ 
+                fontSize: typography.fontSize.xl, 
+                fontWeight: 700, 
+                color: vars.text,
+                marginBottom: spacing[2]
+              }}>
+                📊 Drill-Down Analytics
+              </div>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexWrap: 'wrap',
+                gap: spacing[2],
+                fontSize: typography.fontSize.base,
+                color: vars.textSecondary
+              }}>
+                {drillDown.breadcrumbs.map((bc, index) => (
+                  <React.Fragment key={index}>
+                    {index > 0 && (
+                      <span style={{ color: vars.textTertiary, fontWeight: 500 }}>→</span>
+                    )}
+                    <button
+                      onClick={() => {
+                        // Navigate to this breadcrumb level
+                        const newBreadcrumbs = drillDown.breadcrumbs.slice(0, index + 1)
+                        const newHash = '#analytics/' + newBreadcrumbs.map(b => `${b.entityType}/${encodeURIComponent(b.entityId)}`).join('/')
+                        const currentUrl = new URL(window.location.href)
+                        window.location.href = currentUrl.pathname + currentUrl.search + newHash
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: index === drillDown.breadcrumbs.length - 1 ? vars.text : vars.primary,
+                        fontWeight: index === drillDown.breadcrumbs.length - 1 ? 700 : 500,
+                        cursor: index === drillDown.breadcrumbs.length - 1 ? 'default' : 'pointer',
+                        textDecoration: 'none',
+                        padding: `${spacing[1]} ${spacing[2]}`,
+                        borderRadius: '4px',
+                        transition: 'all 0.2s',
+                        fontSize: typography.fontSize.base
+                      }}
+                      onMouseEnter={(e) => {
+                        if (index !== drillDown.breadcrumbs.length - 1) {
+                          e.currentTarget.style.backgroundColor = vars.backgroundSecondary
+                          e.currentTarget.style.textDecoration = 'underline'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent'
+                        e.currentTarget.style.textDecoration = 'none'
+                      }}
+                      disabled={index === drillDown.breadcrumbs.length - 1}
+                    >
+                      {bc.entityName}
+                    </button>
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
             {/* Drill-down Summary */}
             <Card $isDark={isDark ?? themeDark} style={{ marginBottom: spacing[6], padding: spacing[4] }}>
               <div style={{ 
@@ -859,6 +929,11 @@ export const ContractsAnalyticsModal: React.FC<ContractsAnalyticsModalProps> = (
                     setDrillDownActiveTab(tab)
                     setEntityPage(1)
                     if (tab !== 'contracts') setDrillDownPage(1)
+                    
+                    // Update URL parameter to persist tab selection
+                    const currentUrl = new URL(window.location.href)
+                    currentUrl.searchParams.set('tab', tab)
+                    window.history.replaceState({}, '', currentUrl.toString())
                   }}
                   style={{
                     padding: `${spacing[2]} ${spacing[4]}`,
