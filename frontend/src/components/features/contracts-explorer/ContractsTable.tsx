@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { Contract } from '../../../types/contracts'
-import { getContractorNames } from '../../../types/contracts'
 import { spacing, typography } from '../../../design-system'
 import { LoadingSpinner } from '../shared/LoadingSpinner'
+import { ContractRow } from './ContractRow'
+import { DEFAULT_ROW_CONFIG, type ContractRowConfig } from './contracts-table-config'
 
 interface ContractsTableProps {
   contracts: Contract[]
@@ -18,6 +19,7 @@ interface ContractsTableProps {
   onContractClick?: (contract: Contract) => void
   onViewContractDetails?: (contract: Contract) => void
   isDark?: boolean
+  rowConfig?: ContractRowConfig  // Optional configuration for row layout
 }
 
 export const ContractsTable: React.FC<ContractsTableProps> = ({
@@ -33,7 +35,8 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
   onSortChange,
   onContractClick,
   onViewContractDetails,
-  isDark = false
+  isDark = false,
+  rowConfig = DEFAULT_ROW_CONFIG  // Use default config if not provided
 }) => {
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -199,195 +202,25 @@ export const ContractsTable: React.FC<ContractsTableProps> = ({
           </thead>
           <tbody>
             {contracts.map((contract, idx) => {
-              const uniqueKey = contract.year && contract.contract_id ? `${contract.year}-${contract.contract_id}` : contract.contract_id || `idx-${idx}`
-              const isEven = idx % 2 === 0
-              const rowBg = isEven ? 'transparent' : (isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)')
+              const uniqueKey = contract.year && contract.contract_id 
+                ? `${contract.year}-${contract.contract_id}` 
+                : contract.contract_id || `idx-${idx}`
+              
               return (
-              <React.Fragment key={uniqueKey}>
-                {/* Row 1 */}
-                <tr 
-                  style={{
-                    borderBottom: 'none',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s',
-                    backgroundColor: rowBg
-                  }}
-                  onMouseEnter={(e) => { 
-                    const nextRow = e.currentTarget.nextElementSibling as HTMLElement
-                    e.currentTarget.style.backgroundColor = hoverBg 
-                    if (nextRow) nextRow.style.backgroundColor = hoverBg
-                  }}
-                  onMouseLeave={(e) => { 
-                    const nextRow = e.currentTarget.nextElementSibling as HTMLElement
-                    e.currentTarget.style.backgroundColor = rowBg
-                    if (nextRow) nextRow.style.backgroundColor = rowBg
-                  }}
-                  onClick={() => onContractClick?.(contract)}
-                >
-                  <td 
-                    rowSpan={2} 
-                    style={{ 
-                      padding: spacing[2], 
-                      textAlign: 'center', 
-                      verticalAlign: 'middle',
-                      borderBottom: `1px solid ${borderColor}`
-                    }}
-                  >
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onViewContractDetails?.(contract)
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                        opacity: 0.7,
-                        transition: 'opacity 0.2s'
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.opacity = '1' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7' }}
-                      title="View details"
-                    >
-                      🔍
-                    </button>
-                  </td>
-                  <td 
-                    rowSpan={2}
-                    style={{ 
-                      padding: `${spacing[2]} ${spacing[2]}`, 
-                      fontSize: typography.fontSize.sm, 
-                      color: textPrimary, 
-                      fontWeight: 600,
-                      verticalAlign: 'middle',
-                      borderBottom: `1px solid ${borderColor}`
-                    }}
-                  >
-                    {contract.contract_id || 'N/A'}
-                  </td>
-                  <td style={{ 
-                    padding: `${spacing[2]} ${spacing[2]}`, 
-                    fontSize: typography.fontSize.sm, 
-                    color: textPrimary,
-                    maxWidth: '400px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '2.0',
-                    wordBreak: 'break-word',
-                    verticalAlign: 'top'
-                  }}>
-                    {getContractorNames(contract).join(' | ') || 'N/A'}
-                  </td>
-                  <td style={{ 
-                    padding: `${spacing[2]} ${spacing[2]}`, 
-                    fontSize: typography.fontSize.sm, 
-                    color: textPrimary
-                  }}>
-                    {contract.region || 'N/A'}
-                  </td>
-                  <td 
-                    rowSpan={2}
-                    style={{ 
-                      padding: `${spacing[2]} ${spacing[2]}`, 
-                      fontSize: typography.fontSize.xs,
-                      verticalAlign: 'middle',
-                      borderBottom: `1px solid ${borderColor}`
-                    }}
-                  >
-                    <span style={{
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      backgroundColor: `${getStatusColor(contract.status)}20`,
-                      color: getStatusColor(contract.status),
-                      border: `1px solid ${getStatusColor(contract.status)}40`,
-                      fontWeight: 600
-                    }}>
-                      {contract.status || 'N/A'}
-                    </span>
-                  </td>
-                  <td style={{ 
-                    padding: `${spacing[2]} ${spacing[2]}`, 
-                    fontSize: typography.fontSize.sm, 
-                    color: textPrimary
-                  }}>
-                    {formatDate(contract.effectivity_date)}
-                  </td>
-                  <td 
-                    rowSpan={2}
-                    style={{ 
-                      padding: `${spacing[2]} ${spacing[2]}`, 
-                      fontSize: typography.fontSize.sm, 
-                      color: textPrimary, 
-                      textAlign: 'right',
-                      fontFamily: 'monospace',
-                      fontWeight: 600,
-                      verticalAlign: 'middle',
-                      borderBottom: `1px solid ${borderColor}`
-                    }}
-                  >
-                    {formatCurrency(contract.cost_php)}
-                  </td>
-                </tr>
-                {/* Row 2 */}
-                <tr 
-                  style={{
-                    borderBottom: `1px solid ${borderColor}`,
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s',
-                    backgroundColor: rowBg
-                  }}
-                  onMouseEnter={(e) => { 
-                    const prevRow = e.currentTarget.previousElementSibling as HTMLElement
-                    e.currentTarget.style.backgroundColor = hoverBg
-                    if (prevRow) prevRow.style.backgroundColor = hoverBg
-                  }}
-                  onMouseLeave={(e) => { 
-                    const prevRow = e.currentTarget.previousElementSibling as HTMLElement
-                    e.currentTarget.style.backgroundColor = rowBg
-                    if (prevRow) prevRow.style.backgroundColor = rowBg
-                  }}
-                  onClick={() => onContractClick?.(contract)}
-                >
-                  <td style={{ 
-                    padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
-                    fontSize: typography.fontSize.xs, 
-                    color: textSecondary,
-                    maxWidth: '400px',
-                    height: '4em',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' as any,
-                    lineHeight: '2.0',
-                    wordBreak: 'break-word',
-                    verticalAlign: 'top'
-                  }}>
-                    {contract.description || 'N/A'}
-                  </td>
-                  <td style={{ 
-                    padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
-                    fontSize: typography.fontSize.xs, 
-                    color: textSecondary,
-                    height: '4em'
-                  }}>
-                    {contract.implementing_office || 'N/A'}
-                  </td>
-                  <td style={{ 
-                    padding: `0 ${spacing[2]} ${spacing[2]} ${spacing[2]}`, 
-                    fontSize: typography.fontSize.xs, 
-                    color: textSecondary,
-                    height: '4em'
-                  }}>
-                    {formatDate(contract.expiry_date)}
-                  </td>
-                </tr>
-              </React.Fragment>
-            )})}
+                <ContractRow
+                  key={uniqueKey}
+                  contract={contract}
+                  index={idx}
+                  isDark={isDark}
+                  config={rowConfig}
+                  onContractClick={onContractClick}
+                  onViewContractDetails={onViewContractDetails}
+                  formatCurrency={formatCurrency}
+                  formatDate={formatDate}
+                  getStatusColor={getStatusColor}
+                />
+              )
+            })}
           </tbody>
         </table>
       </div>
